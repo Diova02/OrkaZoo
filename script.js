@@ -22,7 +22,10 @@ const translations = {
         animalFound: "Você acertou <strong>{animal}</strong> em {attempts} tentativa(s).", animalReveal: "O animal era <strong>{animal}</strong>.",
         toastErrList: "Animal não encontrado!", toastErrDup: "Você já tentou esse animal!", toastWin: "Parabéns! Você venceu!", toastLose: "Fim de jogo!",
         global: "Global", tomorrow: "Volte amanhã para novos desafios!",
-        share: "COMPARTILHAR", shareMsg: "Resultado copiado!"
+        share: "COMPARTILHAR", shareMsg: "Resultado copiado!",
+        startMsg: "Tudo começa com um chute...",
+        startSub: "Digite um animal para começar!",
+        time: "Tempo",
     },
     en: {
         attempts: "Attempts", guess: "Guess", animal: "Animal", weight: "Weight", diet: "Diet", habitat: "Habitat", continent: "Continent", class: "Class", pop: "Pop.",
@@ -36,7 +39,10 @@ const translations = {
         animalFound: "You guessed <strong>{animal}</strong> in {attempts} attempt(s).", animalReveal: "The animal was <strong>{animal}</strong>.",
         toastErrList: "Animal not found!", toastErrDup: "Already guessed that!", toastWin: "Congrats! You won!", toastLose: "Game Over!",
         global: "Global", tomorrow: "Come back tomorrow for new challenges!",
-        share: "SHARE", shareMsg: "Copied to clipboard!"
+        share: "SHARE", shareMsg: "Copied to clipboard!",
+        startMsg: "It all starts with a guess...",
+        startSub: "Type an animal to start!",
+        time: "Time",
     }
 };
 
@@ -63,10 +69,12 @@ const ptCorrections = {
     "Detritivoro": "Detritívoro" // Nova dieta adicionada
 };
 
-let currentLang = 'pt';
+let currentLang = localStorage.getItem('orkaZooLang') || 'pt';
 let gameState = { targetAnimal: null, attemptsCount: 0, guessedNames: new Set(), isGameOver: false, currentDate: new Date() };
 let currentFocus = -1;
 let calendarMonth = new Date();
+let startTime = null;
+let endTime = null;
 
 // DOM Elements
 const input = document.getElementById("guess-input");
@@ -82,6 +90,10 @@ const summaryBox = document.getElementById("page-end-summary");
 // INICIALIZAÇÃO
 // ==========================================
 function initGame(dateInput = new Date()) {
+    langBtn.textContent = currentLang.toUpperCase();
+    applyTranslation(); 
+    input.placeholder = currentLang === 'pt' ? "Digite um animal..." : "Type an animal...";
+
     resetGameUI();
     const gameDate = new Date(dateInput);
     gameDate.setHours(0,0,0,0);
@@ -116,6 +128,9 @@ function resetGameUI() {
     summaryBox.style.display = "none";
     attemptDisplay.textContent = "0";
     closeModal('modal-end');
+    document.getElementById("empty-state").style.display = "block"; // Mostra msg inicial
+    startTime = null;
+    endTime = null;
 }
 
 // ==========================================
@@ -134,6 +149,7 @@ function formatTerm(val) {
 
 langBtn.addEventListener("click", () => {
     currentLang = currentLang === 'pt' ? 'en' : 'pt';
+    localStorage.setItem('orkaZooLang', currentLang);
     langBtn.textContent = currentLang.toUpperCase();
     applyTranslation();
     updateDateDisplay();
@@ -170,10 +186,17 @@ input.addEventListener("input", function() {
     if (!val) return;
     currentFocus = -1;
 
-    const matches = animalsDB.filter(a => {
+    let matches = animalsDB.filter(a => {
         const ptName = normalizeStr(a.nome.pt);
         const enName = normalizeStr(a.nome.en);
         return ptName.includes(val) || enName.includes(val);
+    });
+
+    // 5. ORDENAR ALFABETICAMENTE NA LÍNGUA ATUAL
+    matches.sort((a, b) => {
+        const nameA = currentLang === 'pt' ? a.nome.pt : a.nome.en;
+        const nameB = currentLang === 'pt' ? b.nome.pt : b.nome.en;
+        return nameA.localeCompare(nameB);
     });
 
     if (matches.length > 0) {
@@ -234,6 +257,11 @@ function processGuess() {
     let guessName = input.value.trim();
     if(!guessName) return;
 
+    // INICIAR TIMER NO PRIMEIRO CHUTE (SE NÃO EXISTIR)
+    if (!startTime) {
+        startTime = Date.now();
+    }
+
     const guessObj = animalsDB.find(a => 
         normalizeStr(a.nome.pt) === normalizeStr(guessName) || 
         normalizeStr(a.nome.en) === normalizeStr(guessName)
@@ -241,6 +269,8 @@ function processGuess() {
     
     if (!guessObj) { showToast(t("toastErrList"), "error"); shakeInput(); return; }
     if (gameState.guessedNames.has(guessObj.nome.pt)) { showToast(t("toastErrDup"), "error"); shakeInput(); return; }
+
+    document.getElementById("empty-state").style.display = "none";
 
     gameState.guessedNames.add(guessObj.nome.pt);
     gameState.attemptsCount++;
@@ -262,9 +292,14 @@ function processGuess() {
 // ==========================================
 // RENDERIZAÇÃO GRID
 // ==========================================
-function renderRow(guess) {
+function renderRow(guess, isReveal = false) {
     const row = document.createElement("div");
     row.className = "guess-row";
+
+    if (isReveal) {//Lógica de revelar em derrota
+        row.classList.add("revealed");
+    }
+
     const target = gameState.targetAnimal;
     
     // Nome
@@ -304,7 +339,13 @@ function renderRow(guess) {
     else pArrow = gIdx < tIdx ? "↑" : "↓";
     createCell(row, `${guess.populacao} <div class='arrow'>${pArrow}</div>`, pClass);
 
-    gridBody.prepend(row);
+    if (isReveal) {
+        gridBody.appendChild(row); // Na derrota, adiciona no FINAL
+        // Scroll suave até o fim para ver a revelação
+        setTimeout(() => row.scrollIntoView({ behavior: 'smooth' }), 100);
+    } else {
+        gridBody.prepend(row); // Chutes normais no TOPO
+    }
 }
 
 let emojiHistory = [];
@@ -386,14 +427,15 @@ function saveProgress() {
     const data = {
         guessed: Array.from(gameState.guessedNames),
         over: gameState.isGameOver,
-        win: gameState.isGameOver && Array.from(gameState.guessedNames).pop() === gameState.targetAnimal.nome.pt
+        win: gameState.isGameOver && Array.from(gameState.guessedNames).pop() === gameState.targetAnimal.nome.pt,
+        startT: startTime, // Salva quando começou
+        endT: endTime      // Salva quando terminou
     };
     localStorage.setItem(getStorageKey(), JSON.stringify(data));
     
-    // Atualiza status global para o calendário
     const isoDate = gameState.currentDate.toISOString().split('T')[0];
     const globalStats = JSON.parse(localStorage.getItem('orkaZoo_calendar') || '{}');
-    globalStats[isoDate] = data.win ? 'win' : (data.over ? 'lose' : 'playing'); // Playing = Amarelo
+    globalStats[isoDate] = data.win ? 'win' : (data.over ? 'lose' : 'playing');
     localStorage.setItem('orkaZoo_calendar', JSON.stringify(globalStats));
 }
 
@@ -401,6 +443,13 @@ function loadProgress() {
     const saved = localStorage.getItem(getStorageKey());
     if (saved) {
         const data = JSON.parse(saved);
+        startTime = data.startT || null; // Recupera tempo
+        endTime = data.endT || null;
+
+        if (data.guessed.length > 0) {
+            document.getElementById("empty-state").style.display = "none";
+        }
+
         data.guessed.forEach(name => {
             const obj = animalsDB.find(a => a.nome.pt === name);
             if(obj) {
@@ -409,11 +458,22 @@ function loadProgress() {
                 renderRow(obj);
             }
         });
+        
         attemptDisplay.textContent = gameState.attemptsCount;
+        
         if(data.over) {
             gameState.isGameOver = true;
             input.disabled = true;
             submitBtn.disabled = true;
+            
+            // Se perdeu, precisamos re-renderizar a linha de revelação se ela não estiver salva nos palpites
+            // Mas como você pediu para adicionar como um chute na derrota:
+            if (!data.win) {
+                 // Verifica se a linha de revelação já foi desenhada (opcional, ou apenas redesenha)
+                 // Como o grid é limpo no init, precisamos desenhar a revelação aqui se for derrota
+                 renderRow(gameState.targetAnimal, true);
+            }
+            
             showPageSummary(data.win); 
         }
     }
@@ -485,8 +545,13 @@ function renderCalendar() {
 // ==========================================
 function endGame(win) {
     gameState.isGameOver = true;
+    endTime = Date.now(); // Para o tempo
     input.disabled = true;
     submitBtn.disabled = true;
+    // SE PERDEU: Adiciona linha de revelação (Tudo errado visualmente)
+    if (!win) {
+        renderRow(gameState.targetAnimal, true);
+    }
     saveProgress();
 
     const modal = document.getElementById('modal-end');
@@ -499,13 +564,26 @@ function endGame(win) {
     document.getElementById('reveal-name').textContent = currentLang === 'pt' ? gameState.targetAnimal.nome.pt : gameState.targetAnimal.nome.en;
     
     const baseName = normalizeStr(gameState.targetAnimal.nome.pt).replace(/\s+/g, "");
-    tryLoadImage(revealImg, baseName, ['png', 'jpg', 'webp'], 0);
+    tryLoadImage(revealImg, baseName, ['png', 'jpg', 'webp'], 0);//Carrega a respectiva imagem, se houver
+    let timeStr = "";
 
+    if (startTime && endTime) {
+        const diff = Math.floor((endTime - startTime) / 1000);
+        const min = Math.floor(diff / 60);
+        const sec = diff % 60;
+        timeStr = `${min}m ${sec}s`;
+    }
+
+    // Adiciona o tempo no texto do modal e resumo
     const animalName = currentLang === 'pt' ? gameState.targetAnimal.nome.pt : gameState.targetAnimal.nome.en;
     let statText = win 
         ? t('animalFound').replace('{animal}', animalName).replace('{attempts}', `<b>${gameState.attemptsCount}</b>`)
         : t('animalReveal').replace('{animal}', animalName);
     
+    if (timeStr) {
+        statText += `<br><span style="font-size:0.85rem; color:#888;">⏱ ${timeStr}</span>`;
+    }
+
     stats.innerHTML = statText;
 
     if (win) { 

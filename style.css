@@ -215,3 +215,26 @@ button:disabled { background: #333; opacity: 0.5; }
     text-transform: uppercase;
 }
 .share-btn:hover { background: #128C7E; }
+
+/* Mensagem de Estado Vazio */
+#empty-state {
+    text-align: center;
+    color: #666;
+    margin-top: 40px;
+    font-style: italic;
+    animation: fadeIn 1s;
+}
+
+/* Linha de Revelação na Derrota (Exceção à regra) */
+.guess-row.revealed .cell {
+    background-color: #220000; /* Fundo bem escuro avermelhado */
+    border-color: var(--wrong);
+    color: #ffcccc;
+    opacity: 0.8;
+}
+/* Força a cor vermelha mesmo se estiver certo, conforme pedido */
+.guess-row.revealed .cell.correct, 
+.guess-row.revealed .cell.partial {
+    background-color: #3a0000 !important;
+    border-color: var(--wrong) !important;
+}
