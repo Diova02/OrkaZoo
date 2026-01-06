@@ -146,5 +146,18 @@ export default [
     { "nome": { "pt": "Tuiuiú", "en": "Jabiru" }, "peso": 7, "dieta": "Carnivoro", "habitat": ["aereo", "aquatico"], "continentes": ["America"], "classe": "Ave", "populacao": "Milhares" },
     { "nome": { "pt": "Corvo", "en": "Raven" }, "peso": 1.2, "dieta": "Onivoro", "habitat": ["aereo"], "continentes": ["America", "Europa", "Asia", "Africa"], "classe": "Ave", "populacao": "Milhões" },
     { "nome": { "pt": "Lesma", "en": "Slug" }, "peso": 0.03, "dieta": "Herbivoro", "habitat": ["terrestre"], "continentes": ["Africa", "Asia", "Europa", "America", "Oceania"], "classe": "Molusco", "populacao": "Bilhões" },
-    { "nome": { "pt": "Equidna", "en": "Echidna" }, "peso": 5, "dieta": "Insetivoro", "habitat": ["terrestre"], "continentes": ["Oceania"], "classe": "Mamifero", "populacao": "Milhares" }
+    { "nome": { "pt": "Equidna", "en": "Echidna" }, "peso": 5, "dieta": "Insetivoro", "habitat": ["terrestre"], "continentes": ["Oceania"], "classe": "Mamifero", "populacao": "Milhares" },
+    { "nome": { "pt": "Gavião", "en": "Hawk" }, "peso": 1, "dieta": "Carnivoro", "habitat": ["aereo"], "continentes": ["Africa", "Asia", "Europa", "America", "Oceania"], "classe": "Ave", "populacao": "Milhões" },
+    { "nome": { "pt": "Porco-espinho", "en": "Porcupine" }, "peso": 10, "dieta": "Herbivoro", "habitat": ["terrestre"], "continentes": ["Africa", "Asia", "Europa", "America"], "classe": "Mamifero", "populacao": "Milhões" },
+    { "nome": { "pt": "Peixe-espada", "en": "Swordfish" }, "peso": 200, "dieta": "Carnivoro", "habitat": ["aquatico"], "continentes": ["Africa", "Asia", "Europa", "America", "Oceania"], "classe": "Peixe", "populacao": "Milhões" },
+    { "nome": { "pt": "Alce", "en": "Moose" }, "peso": 600, "dieta": "Herbivoro", "habitat": ["terrestre"], "continentes": ["America", "Europa", "Asia"], "classe": "Mamifero", "populacao": "Milhares" },
+    { "nome": { "pt": "Viúva-Negra", "en": "Black Widow" }, "peso": 0.001, "dieta": "Carnivoro", "habitat": ["terrestre"], "continentes": ["America", "Africa", "Asia", "Europa", "Oceania"], "classe": "Aracnideo", "populacao": "Milhões" },
+    { "nome": { "pt": "Sanguessuga", "en": "Leech" }, "peso": 0.002, "dieta": "Hematofago", "habitat": ["aquatico"], "continentes": ["Africa", "Asia", "Europa", "America", "Oceania"], "classe": "Anelideo", "populacao": "Bilhões" },
+    { "nome": { "pt": "Jabuti", "en": "Red-footed Tortoise" }, "peso": 10, "dieta": "Onivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Reptil", "populacao": "Milhões" },
+    { "nome": { "pt": "Pantera Negra", "en": "Black Panther" }, "peso": 80, "dieta": "Carnivoro", "habitat": ["terrestre"], "continentes": ["Africa", "Asia"], "classe": "Mamifero", "populacao": "Milhares" },
+    { "nome": { "pt": "Vagalume", "en": "Firefly" }, "peso": 0.0002, "dieta": "Onivoro", "habitat": ["aereo"], "continentes": ["Africa", "Asia", "Europa", "America", "Oceania"], "classe": "Inseto", "populacao": "Bilhões" }
+
+    //Até aqui há 156 animais. O que é sufiente para ~5 meses e 6 dias de jogos sem repetição. (partindo de 01/12/2025)
+    //Caso você adicione animais após esse tempo, atualize a const CHECKPOINTS no script.js
+    //Obrigado.
 ];

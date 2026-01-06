@@ -23,5 +23,10 @@ export default [
             pt: "A <strong>Lista vermelha da IUCN</strong> é uma lista que classifica os animais em riscos de extinção. Existem 9 categorias, indo de 'Pouco preocupante' até 'Extinto'. No Brasil, mais de 1.200 espécies de animais estão ameaçadas (incluindo as categorias Perigo Crítico, Perigo e Vulnerável)",
             en: "The IUCN Red List is a list that classifies animals according to their risk of extinction. There are 9 categories, ranging from 'Least Concern' to 'Extinct'. In Brazil, more than 1,200 animal species are threatened (including the Critically Endangered, Endangered, and Vulnerable categories)."
         }, img: "Mico leao dourado" 
+    },
+    {   dica: {
+            pt: "Esta é a <strong>Salamandra Gigante Chinesa</strong>, o maior anfíbio já descoberto pelo homem.",
+            en: "This is the <strong>Chinese Giant Salamander</strong>, the largest amphibian ever discovered by man."
+        }, img: "Salamandra gigante" 
     }
 ];

@@ -99,6 +99,30 @@ const summaryBox = document.getElementById("page-end-summary");
 const tipBtn = document.getElementById("tip-btn");
 
 // ==========================================
+// CONTROLE DE VERSÃO DO BANCO (Anti-Quebra)
+// ==========================================
+/* COMO USAR:
+   Quando você adicionar novos animais no fim do array 'animaisDB', 
+   crie um novo marco aqui com a data da atualização e o tamanho ANTERIOR do banco.
+   
+   Isso "congela" a lógica matemática para os dias passados.
+*/
+const CHECKPOINTS = [
+    // CARO DESENVOLVEDOR: Essa constante previne quebra do banco de dados no futuro. 
+    // Caso você decida adicionar novos animais (e você vai querer) 
+    // Sempre que o jogo já estiver reaproveitando animais passados, volte nesta constante e adicione:
+    // { date: "YYYY-DD-MM", limit: número de entradas ANTES da adição },
+    // Isso fará com que um portal temporal se abra e que o histórico seja preservado corretamente.
+];
+
+// Dias Especiais (Controle Editorial)
+const SPECIAL_DAYS = {//Exemplos:
+    //"2024-12-25": "Rena",           // Natal
+    //"2024-10-31": "Morcego",        // Halloween
+    //"2024-01-01": "Mico Leão Dourado" // Exemplo
+};
+
+// ==========================================
 // LÓGICA DA CURIOSIDADE DO DIA
 // ==========================================
 function getDailyTip() {
@@ -159,11 +183,43 @@ function initGame(dateInput = new Date()) {
 }
 
 function getTargetByDate(dateObj) {
+    // 1. Verifica Controle Editorial (Exceção)
+    const dateKey = dateObj.toISOString().split('T')[0];
+    if (SPECIAL_DAYS[dateKey]) {
+        const specialName = SPECIAL_DAYS[dateKey];
+        const specialAnimal = animalsDB.find(a => a.nome.pt === specialName);
+        if (specialAnimal) return specialAnimal;
+        console.warn(`Animal especial '${specialName}' não encontrado no DB! Usando fallback.`);
+    }
+
+    // 2. Calcula dias passados desde o início (01/01/2024)
     const diffTime = Math.abs(dateObj - START_DATE);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    if(diffDays < 0) return animalsDB[0];
-    const index = diffDays % animalsDB.length;
-    return animalsDB[index];
+    const dayIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if(dayIndex < 0) return animalsDB[0]; // Proteção
+
+    // 3. Lógica de Marcos Temporais (A MÁGICA ACONTECE AQUI)
+    // Verifica se a data consultada é anterior a algum update que fizemos
+    let activeDbSize = animalsDB.length;
+    let offset = 0;
+
+    for (const check of CHECKPOINTS) {
+        const checkDate = new Date(check.date);
+        // Se a data do jogo for ANTERIOR ao checkpoint, usamos o limite daquela época
+        if (dateObj < checkDate) {
+            activeDbSize = check.limit;
+            break; 
+        }
+        // Se passamos por um checkpoint, podemos ajustar o offset se necessário 
+        // (mas geralmente só travar o tamanho já resolve o loop)
+    }
+
+    // 4. Seleção Matemática Segura
+    // O operador % (resto) garante o loop infinito seguro
+    const index = dayIndex % activeDbSize;
+    
+    // Fallback: Se por acaso o índice for maior que o banco atual (bug raro), pega o último
+    return animalsDB[index] || animalsDB[animalsDB.length - 1];
 }
 
 function resetGameUI() {
