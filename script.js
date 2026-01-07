@@ -1,5 +1,6 @@
 import animalsDB from './animais.js';
 import curiositiesDB from './curiosidades.js';
+import { OrkaFX, OrkaDate, OrkaStorage, Utils } from './core/orka-lib.js';
 
 // ==========================================
 // CONFIGURAÇÃO
@@ -372,8 +373,8 @@ function processGuess() {
         normalizeStr(a.nome.en) === normalizeStr(guessName)
     );
     
-    if (!guessObj) { showToast(t("toastErrList"), "error"); shakeInput(); return; }
-    if (gameState.guessedNames.has(guessObj.nome.pt)) { showToast(t("toastErrDup"), "error"); shakeInput(); return; }
+    if (!guessObj) { OrkaFX.toast(t("toastErrList"), "error"); OrkaFX.shake(); return; }
+    if (gameState.guessedNames.has(guessObj.nome.pt)) { OrkaFX.toast(t("toastErrDup"), "error"); OrkaFX.shake(); return; }
 
     document.getElementById("empty-state").style.display = "none";
 
@@ -475,9 +476,9 @@ window.shareResult = function() {
     text += "\nJogue em: orka-zoo.vercel.app"; // Seu link aqui
 
     navigator.clipboard.writeText(text).then(() => {
-        showToast(t("shareMsg"), "success");
+        OrkaFX.toast(t("shareMsg"), "success");
     }).catch(() => {
-        showToast("Erro ao copiar", "error");
+        OrkaFX.toast("Erro ao copiar", "error");
     });
 };
 
@@ -692,11 +693,11 @@ function endGame(win) {
     stats.innerHTML = statText;
 
     if (win) { 
-        triggerConfetti(); 
-        showToast(t('toastWin'), "success"); 
+        OrkaFX.confetti(); 
+        OrkaFX.toast(t('toastWin'), "success"); 
     } 
     else { 
-        showToast(t('toastLose'), "error"); 
+        OrkaFX.toast(t('toastLose'), "error"); 
     }
 
     showPageSummary(win);
@@ -724,44 +725,13 @@ function tryLoadImage(img, name, formats, idx) {
     img.onerror = () => tryLoadImage(img, name, formats, idx+1);
 }
 
-function showToast(msg, type) {
-    const c = document.getElementById('toast-container');
-    const div = document.createElement('div');
-    div.className = `toast ${type}`;
-    div.textContent = msg;
-    c.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
-}
-
 function normalizeStr(str) { return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
 function formatWeight(kg) { return kg < 1 ? (kg * 1000) + "g" : (kg >= 1000 ? (kg / 1000) + "t" : kg + "kg"); }
-function shakeInput() { input.animate([{ transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }], { duration: 300 }); }
 function getArrayStatus(g, t) {
     const intersect = g.filter(x => t.includes(x));
     if (g.length === t.length && intersect.length === t.length) return "correct";
     if (intersect.length > 0) return "partial";
     return "wrong";
-}
-// ATUALIZAÇÃO DA FUNÇÃO triggerConfetti (CHUVA SUAVE)
-function triggerConfetti() {
-    const colors = ['#0055ff', '#ffffff', '#2e8b57', '#e4b00f', '#ff0055'];
-    
-    for (let i = 0; i < 60; i++) {
-        const c = document.createElement('div');
-        c.className = 'confetti-piece';
-        c.style.left = Math.random() * 100 + 'vw'; // Posição horizontal aleatória
-        c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Variação na duração e atraso para parecer natural
-        const duration = Math.random() * 3 + 3; // 3 a 6 segundos
-        c.style.animation = `fall ${duration}s linear forwards`;
-        c.style.animationDelay = Math.random() * 2 + 's';
-        
-        document.body.appendChild(c);
-        
-        // Remove do DOM após cair
-        setTimeout(() => c.remove(), duration * 1000 + 2000);
-    }
 }
 
 window.closeModal = (id) => document.getElementById(id).classList.remove('active');

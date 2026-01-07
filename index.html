@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Orka Zoo - Desafio Diário</title>
-    <link rel="icon" type="image/png" href="orka-logo.png">
+    <link rel="icon" type="image/png" href="zoo-logo.png">
+    
+    <link rel="stylesheet" href="core/orka-base.css">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script type="module">
@@ -20,12 +22,12 @@
     <div class="header-content">
         <div class="left-group">
             <img src="orka-logo.png" alt="Orka Studio" class="orka-logo">
-            <button id="tip-btn" title="Curiosidade do Dia">?</button>
+            <button id="tip-btn" title="Curiosidade do Dia" class="orka-icon-btn">?</button>
         </div>
 
         <div id="modal-tip" class="modal-overlay">
             <div class="modal-content">
-                <h2 style="color: var(--accent-color); margin-bottom: 10px;" data-t="tipTitle">CURIOSIDADE DO DIA</h2>
+                <h2 style="color: var(--orka-accent); margin-bottom: 10px;" data-t="tipTitle">CURIOSIDADE DO DIA</h2>
                 
                 <img id="tip-img" class="animal-reveal-img" src="" alt="" style="display:none; max-height: 200px;">
                 
@@ -41,8 +43,8 @@
         </div>
         
         <div class="right-group">
-            <button id="lang-btn" class="icon-btn" title="Mudar Idioma">PT</button>
-            <button id="calendar-btn" class="icon-btn" title="Calendário"><span class="material-icons">calendar_today</span></button>
+            <button id="lang-btn" class="orka-icon-btn" title="Mudar Idioma">PT</button>
+            <button id="calendar-btn" class="orka-icon-btn" title="Calendário"><span class="material-icons">calendar_today</span></button>
         </div>
     </div>
 </header>
@@ -98,7 +100,7 @@
 
 <div id="modal-help" class="modal-overlay">
     <div class="modal-content">
-        <h2 style="color: var(--accent-color); margin-bottom: 10px;">BEM-VINDO(A) AO ORKA ZOO!</h2>
+        <h2 style="color: var(--orka-accent); margin-bottom: 10px;">BEM-VINDO(A) AO ORKA ZOO!</h2>
         <p style="font-size: 0.95rem; margin-bottom: 20px;">
             Seu objetivo é descobrir qual é o <strong>Animal Secreto</strong> do dia.
         </p>
@@ -112,7 +114,7 @@
 
             <p style="margin: 10px 0 5px 0;"><strong>Entenda as cores:</strong></p>
             <div style="display: flex; gap: 10px; margin-bottom: 5px;">
-                <span style="background:var(--correct); color:white; padding:2px 6px; border-radius:4px; font-size:0.8rem;">VERDE</span>
+                <span style="background:var(--status-correct); color:white; padding:2px 6px; border-radius:4px; font-size:0.8rem;">VERDE</span>
                 <span style="color:#ccc">Atributo exato.</span>
             </div>
             <div style="display: flex; gap: 10px; margin-bottom: 5px;">
