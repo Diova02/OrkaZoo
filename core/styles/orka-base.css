@@ -147,131 +147,6 @@ body {
 }
 
 
-/* --- 2. Seções do Hub --- */
-.hub-section {
-    max-width: 900px;
-    width: 95%;
-    margin: 0 auto 40px auto; /* Margem inferior para separar categorias */
-}
-
-/* --- ITEM 1: Categorias Ancoradas à Esquerda --- */
-.hub-section h2 {
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-    font-size: 1rem;
-    color: var(--orka-accent);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    
-    /* Garante alinhamento à esquerda */
-    text-align: left; 
-    display: block;
-}
-
-/* --- 3. Card Horizontal de Jogo --- */
-.game-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Espaço entre os jogos */
-}
-
-.game-card-horizontal {
-    display: flex;
-    align-items: center;
-    background: #0f0f0f; /* Um pouco mais claro que o fundo */
-    border: 1px solid var(--orka-border);
-    border-radius: 8px;
-    height: 100px; /* Altura fixa para consistência */
-    text-decoration: none;
-    color: white;
-    overflow: hidden; /* Garante que a imagem não saia */
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-/* Efeito Hover no Card */
-.game-card-horizontal:hover {
-    border-color: var(--orka-accent);
-    transform: translateX(5px); /* Move levemente para a direita */
-    background: #141414;
-}
-
-/* Espaço para a Print (Thumb grande) */
-.card-print {
-    width: 160px; /* Largura da "Print" */
-    height: 100%;
-    background-color: #1a1a1a;
-    object-fit: cover;
-    flex-shrink: 0; /* Não deixa espremer */
-    border-right: 1px solid #222;
-}
-
-/* Área de Conteúdo (Ícone + Texto) */
-.card-content {
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    gap: 15px;
-    flex-grow: 1;
-}
-
-/* Ícone Pequeno do Jogo */
-.card-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 8px; /* Quadrado arredondado */
-    object-fit: contain;
-    background: #000;
-    border: 1px solid #333;
-}
-
-.card-text h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #fff;
-}
-
-.card-text p {
-    margin: 3px 0 0 0;
-    font-size: 0.8rem;
-    color: #888;
-}
-
-/* Etiqueta "Em Breve" ou seta */
-.card-action {
-    margin-right: 20px;
-    opacity: 0.5;
-}
-
-
-/* --- 4. Estado Vazio (Empty State) --- */
-.empty-msg {
-    /* Removemos a borda e o fundo para tirar o aspecto de "casca" */
-    border: none;
-    background: transparent;
-    
-    /* Alinhamento e tipografia */
-    text-align: left;
-    padding: 10px 0; /* Leve espaçamento vertical */
-    color: #444; /* Cinza bem escuro para ser discreto */
-    font-size: 0.85rem;
-    font-style: italic;
-    
-    /* Opcional: Adiciona um ícone visual antes do texto usando CSS */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Um pequeno detalhe visual antes do texto (opcional) */
-.empty-msg::before {
-    content: "•";
-    color: #333;
-    font-size: 1.5rem;
-    line-height: 0;
-}
 @view-transition {
     navigation: auto;
 }
@@ -284,4 +159,31 @@ body {
 @keyframes pageEntrance {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   SCROLLBAR GLOBAL (Site Inteiro)
+   ========================================= */
+
+/* Largura da barra vertical e altura da horizontal */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* O fundo por onde a barra corre (trilho) */
+::-webkit-scrollbar-track {
+    background: var(--orka-bg); 
+}
+
+/* A barra em si (o polegar) */
+::-webkit-scrollbar-thumb {
+    background: #333; 
+    border-radius: 5px; /* Redondinho */
+    border: 2px solid var(--orka-bg); /* Cria um respiro visual */
+}
+
+/* Quando passa o mouse na barra */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--orka-accent); 
 }

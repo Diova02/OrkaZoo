@@ -1,0 +1,204 @@
+/* --- 2. Seções do Hub --- */
+.hub-section {
+    max-width: 100%;
+    width: 95%;
+    margin: 0 auto 40px auto; /* Margem inferior para separar categorias */
+}
+
+/* --- ITEM 1: Categorias Ancoradas à Esquerda --- */
+.hub-section h2 {
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: var(--orka-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    
+    /* Garante alinhamento à esquerda */
+    text-align: left; 
+    display: block;
+}
+
+/* --- 3. Card de Jogo (Estilo Netflix) --- */
+
+.game-list {
+    display: flex;
+    flex-direction: row; /* Alinha um ao lado do outro */
+    gap: 20px;
+    
+    /* Mágica do Scroll Horizontal */
+    overflow-x: auto; 
+    overflow-y: hidden;
+    padding: 20px 5px; /* Padding vertical extra para o efeito hover não cortar */
+    
+    /* Comportamento de Snap (opcional: faz parar certinho no card) */
+    scroll-snap-type: x mandatory; 
+    
+    /* Suavidade na rolagem */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estilização da Barra de Rolagem (Scrollbar) */
+.game-list::-webkit-scrollbar {
+    height: 8px; /* Altura da barra horizontal */
+}
+.game-list::-webkit-scrollbar-track {
+    background: #0f0f0f; 
+    border-radius: 4px;
+}
+.game-list::-webkit-scrollbar-thumb {
+    background: #333; 
+    border-radius: 4px;
+}
+.game-list::-webkit-scrollbar-thumb:hover {
+    background: var(--orka-accent); 
+}
+
+/* O Card em si */
+.game-card-horizontal {
+    /* Fixando tamanhos */
+    min-width: 240px; /* Largura fixa (importante usar min-width para não esmagar) */
+    width: 240px;
+    height: 180px;    /* Altura fixa */
+    
+    /* Layout interno */
+    display: flex;
+    flex-direction: column;
+    background: #0f0f0f;
+    border: 1px solid var(--orka-border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: white;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    
+    /* Garante que o item não encolha no flex container */
+    flex-shrink: 0;
+    scroll-snap-align: start; /* Alinha à esquerda ao soltar o scroll */
+}
+
+/* Efeito Hover */
+.game-card-horizontal:hover {
+    border-color: var(--orka-accent);
+    transform: translateY(-10px); /* Sobe mais visivelmente */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+    z-index: 2;
+    height: 230px;
+}
+
+/* Área da Imagem Principal (Print) */
+.card-print {
+    width: 100%;
+    height: 200px; /* Aumentei um pouco a área da imagem */
+    background-color: #1a1a1a;
+    object-fit: cover;
+    border-bottom: 1px solid #222;
+    transition: filter 0.3s;
+}
+
+.game-card-horizontal:hover .card-print {
+    filter: brightness(1.1);
+}
+
+/* Barra Inferior (Footer do Card) */
+.card-content {
+    display: flex;
+    flex-direction: column; /* Organiza ícone e texto verticalmente para caber melhor */
+    justify-content: space-between;
+    padding: 15px;
+    height: 50%; /* Ocupa o resto do card */
+    background: linear-gradient(to bottom, #111, #0a0a0a);
+}
+
+/* Área superior do conteúdo (Ícone + Texto) */
+.card-info-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* Ícone Pequeno */
+.card-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    object-fit: contain;
+    background: #000;
+    border: 1px solid #333;
+    flex-shrink: 0;
+}
+
+/* Texto */
+.card-text h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+.card-text p {
+    margin: 5px 0 0 0;
+    font-size: 0.8rem;
+    color: #888;
+    display: block; /* Trouxe de volta a descrição se quiser, fica bonito no card alto */
+    line-height: 1.3;
+}
+
+/* Ação (Botão/Seta) - Fica no pé do card */
+.card-action {
+    margin-top: auto; /* Empurra para o fundo */
+    width: 100%;
+    padding-top: 10px;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: flex-end;
+    color: var(--orka-accent);
+}
+
+.game-card-horizontal:hover .card-action {
+    opacity: 1;
+    transform: translateX(3px);
+    transition: transform 0.2s;
+}
+
+
+
+/* --- 4. Estado Vazio (Empty State) --- */
+.empty-msg {
+    /* Removemos a borda e o fundo para tirar o aspecto de "casca" */
+    border: none;
+    background: transparent;
+    
+    /* Alinhamento e tipografia */
+    text-align: left;
+    padding: 10px 0; /* Leve espaçamento vertical */
+    color: #444; /* Cinza bem escuro para ser discreto */
+    font-size: 0.85rem;
+    font-style: italic;
+    
+    /* Opcional: Adiciona um ícone visual antes do texto usando CSS */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Um pequeno detalhe visual antes do texto (opcional) */
+.empty-msg::before {
+    content: "•";
+    color: #333;
+    font-size: 1.5rem;
+    line-height: 0;
+}
+
+main{
+    width: 100%;            /* Força a ocupar a largura da tela */
+    max-width: 900px;       /* Impede que fique largo demais em monitores grandes */
+    flex: 1;                /* Garante que o main empurre o footer para baixo */
+    display: flex;          /* Mantém a organização interna */
+    flex-direction: column;
+}
