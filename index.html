@@ -16,129 +16,72 @@
     <header>
         <div class="header-content">
             <div class="left-group">
-                <a href="/" class="home-link" title="Voltar para o início">
-                    <img src="assets/icons/orka-logo.png" alt="Orka Studio" class="orka-logo">
+                <a href="../../index.html" class="home-link" title="Voltar ao Hub">
+                    <img src="../../assets/icons/orka-logo.png" alt="Orka Studio" class="orka-logo">
                 </a>
             </div>
             <div class="title-group">
-                <h1>ORKA STUDIO</h1>
+                <h1>ORKA JINX</h1>
             </div>
             <div class="right-group">
-                <div class="right-group">
-                    <button id="btn-profile" class="icon-btn" title="Configurar Perfil">
-                        <span class="material-icons">person</span>
-                    </button>
                 </div>
-            </div>
         </div>
     </header>
 
-    <main>
-
-        <section class="hub-section">
-            <h2>Jogos Diários</h2>
-            <div class="game-list">
-                
-                <a href="games/orkazoo/" class="game-card-horizontal">
-                    <img src="assets/prints/print-zoo.png" alt="Orka Zoo" class="card-print" onerror="this.src='assets/icons/orka-logo.png'"> 
-                    
-                    <div class="card-content">
-                        <div class="card-info-top">
-                            <img src="assets/icons/zoo-logo.png" class="card-icon" alt="Z" onerror="this.style.background='#333'">
-                            <div class="card-text"><h3>ORKA ZOO</h3><p>Descubra o animal do dia.</p></div>
-                        </div>
-                        <div class="card-action"><span class="material-icons">play_arrow</span></div>
-                    </div></a>
-            </div>
-        </section>
-
-        <section class="hub-section">
-            <h2>Jogos Web</h2>
-
-            <div class="game-list"><div class="empty-msg">Nada aqui ainda!</div></div>
-
-        </section>
-
-        <section class="hub-section">
-            <h2>PnP</h2>
-            <div class="game-list"><div class="empty-msg">Nada aqui ainda!</div></div>
-        </section>
-
-        <section class="hub-section">
-            <h2>Em Breve</h2>
-            <div class="game-list">
-                
-                <div class="game-card-horizontal" style="opacity: 0.5; cursor: default;">
-                    <div class="card-print" style="display:flex; align-items:center; justify-content:center; color:#444;">🚧</div>
-                    
-                    <div class="card-content">
-                        <div class="card-info-top">    
-                        <div class="card-text">
-                            <h3>LISTIT</h3>
-                            <p>Organize o caos.</p>
-                        </div>
-                    </div>
+    <main id="game-app">
+        
+        <section id="scene-lobby" class="lobby-container">
+            <div style="width:100%; max-width:300px; text-align:center;">
+                <label style="color:#666; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Idioma da Sala</label>
+                <div class="lang-selector" style="display:flex; gap:10px; margin-bottom:30px; margin-top:10px;">
+                    <button id="btn-lang-pt" class="orka-btn orka-btn-primary" style="flex:1;">PT-BR</button>
+                    <button id="btn-lang-en" class="orka-btn" style="flex:1; background:#222; color:#888;">EN-US</button>
                 </div>
 
+                <button id="btn-create" class="orka-btn orka-btn-primary" style="width:100%; margin-bottom:15px; padding:15px;">CRIAR SALA</button>
+                
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="input-room-code" placeholder="CÓDIGO" class="orka-input" style="flex:1; text-align:center; text-transform:uppercase; font-weight:bold;" maxlength="4">
+                    <button id="btn-join" class="orka-btn">ENTRAR</button>
+                </div>
             </div>
+        </section>
+
+        <section id="scene-waiting" class="lobby-container" style="display:none;">
+            <p style="font-size:0.9rem; color:#888; text-transform:uppercase;">Compartilhe este código</p>
+            <div id="display-code" class="room-code-display">----</div>
+            
+            <div id="waiting-list" style="margin:30px 0; width:100%; text-align:center;">
+                </div>
+
+            <p style="font-size:0.8rem; color:#666; margin-bottom:20px;">Aguardando jogadores...</p>
+            <button id="btn-start" class="orka-btn orka-btn-primary" disabled>COMEÇAR JOGO</button>
+        </section>
+
+        <section id="scene-game" style="display:none; height:100%; flex-direction:column;">
+            
+            <div class="game-status">
+                <span id="status-text">SINCRONIA MENTAL</span>
+                <div id="round-counter" style="font-size:0.75rem; color:var(--orka-accent); margin-top:5px;">RODADA 1</div>
+            </div>
+
+            <div id="players-grid" class="players-grid">
+                </div>
+
+            <div class="game-footer-fixed">
+                <div id="suggestions-box" class="suggestions-list" style="display:none;"></div>
+                
+                <div class="input-wrapper">
+                    <input type="text" id="word-input" placeholder="DIGITE UMA PALAVRA..." autocomplete="off">
+                    <button id="btn-send-word" class="icon-btn" style="background:var(--orka-accent); border:none;"><span class="material-icons">send</span></button>
+                </div>
+            </div>
+
         </section>
 
     </main>
 
-    <footer style="text-align: center; color: #444; padding: 40px; font-size: 0.8rem;">
-        &copy; 2026 Orka Studio. Todos os direitos reservados.
-    </footer>
+    <script type="module" src="game.js"></script>
 
-    <div id="modal-profile" class="modal-overlay">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; font-size:1.2rem; color:var(--orka-accent);">PERFIL</h2>
-            <button id="btn-close-profile" class="icon-btn" style="border:none;"><span class="material-icons">close</span></button>
-        </div>
-
-        <div class="profile-avatar-container">
-            <div class="profile-avatar-box">
-                <span class="material-icons">person</span>
-            </div>
-        </div>
-
-        <div class="profile-section">
-            <label>Seu Apelido</label>
-            
-            <div id="view-nick-mode" class="nick-container">
-                <span id="display-nick" class="nick-text">...</span>
-                <button id="btn-edit-nick" class="icon-btn-small" title="Editar"><span class="material-icons" style="font-size:1rem;">edit</span></button>
-            </div>
-
-            <div id="edit-nick-mode" class="nick-container" style="display:none;">
-                <input type="text" id="input-nick" placeholder="Sem apelido..." class="orka-input">
-                <button id="btn-save-nick" class="icon-btn-small success" title="Salvar"><span class="material-icons" style="font-size:1rem;">check</span></button>
-                <button id="btn-delete-nick" class="icon-btn-small danger" title="Remover Nick"><span class="material-icons" style="font-size:1rem;">delete</span></button>
-            </div>
-            
-            <button id="btn-add-nick" class="orka-btn orka-btn-primary" style="display:none; margin-top:10px; width:100%;">
-                Adicionar Nickname
-            </button>
-        </div>
-
-        <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
-
-        <div class="profile-section">
-            <label>Idioma / Language</label>
-            <div class="lang-selector">
-                <button class="lang-option selected" data-lang="pt-BR">
-                    🇧🇷 Português
-                </button>
-                <button class="lang-option" data-lang="en-US">
-                    🇺🇸 English
-                </button>
-            </div>
-            <p style="font-size:0.75rem; color:#666; margin-top:5px;">
-                Jogos usarão esta preferência automaticamente.
-            </p>
-        </div>
-    </div>
-</div>
-<script type="module" src="script.js"></script>
 </body>
 </html>

@@ -117,3 +117,109 @@
     margin: 10px 0;
     font-family: monospace;
 }
+
+/* Ajuste Geral para comportar o header fixo */
+body {
+    padding-top: 0; /* Orka-base já cuida disso, mas garantindo */
+    overflow: hidden; /* Evita scroll duplo com a barra fixa */
+}
+
+#game-app {
+    height: calc(100vh - 80px); /* Desconta o header */
+    display: flex;
+    flex-direction: column;
+    max-width: 100%; /* Ocupa tela toda */
+    margin: 0;
+    padding: 0;
+}
+
+/* --- ESTILO NOVO DA BARRA FIXA --- */
+.game-footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    border-top: 1px solid #333;
+    padding: 15px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 10px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#word-input {
+    flex: 1;
+    background: #000;
+    border: 1px solid #333;
+    padding: 12px 20px;
+    color: white;
+    font-size: 1rem;
+    border-radius: 30px; /* Redondinho estilo chat */
+    outline: none;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+#word-input:focus { border-color: var(--orka-accent); }
+#word-input:disabled { opacity: 0.5; background: #1a1a1a; cursor: not-allowed; }
+
+/* --- LISTA DE SUGESTÕES (Estilo Orka Zoo) --- */
+.suggestions-list {
+    position: absolute;
+    bottom: 80px; /* Logo acima da barra */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    max-height: 200px; /* Scroll se for grande */
+    overflow-y: auto;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column-reverse; /* Faz crescer pra cima visualmente se quiser */
+}
+
+.suggestion-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    text-transform: uppercase;
+}
+
+.suggestion-item:hover {
+    background: var(--orka-accent);
+    color: white;
+}
+
+.suggestion-item:last-child { border-bottom: none; }
+
+/* --- Ajustes no Grid de Jogadores --- */
+.players-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto; /* Scroll se tiver muitos players */
+    align-content: center;
+    justify-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+    padding-bottom: 100px; /* Espaço para não ficar atrás da barra */
+}
