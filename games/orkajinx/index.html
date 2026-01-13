@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindSync | Orka Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+    <main id="game-app">
+        
+        <section id="scene-lobby" class="lobby-container">
+            <h1 style="text-transform:uppercase; letter-spacing:3px; margin-bottom:30px;">MindSync</h1>
+            
+            <div style="width:100%; max-width:300px;">
+                <label style="color:#666; font-size:0.8rem;">Idioma da Sala</label>
+                <div class="lang-selector" style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button id="btn-lang-pt" class="orka-btn orka-btn-primary" style="flex:1;">PT-BR</button>
+                    <button id="btn-lang-en" class="orka-btn" style="flex:1; background:#222; color:#888;">EN-US</button>
+                </div>
+
+                <button id="btn-create" class="orka-btn orka-btn-primary" style="width:100%; margin-bottom:15px;">Criar Sala</button>
+                
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="input-room-code" placeholder="Código da Sala" class="orka-input" style="flex:1; text-align:center; text-transform:uppercase;" maxlength="4">
+                    <button id="btn-join" class="orka-btn">Entrar</button>
+                </div>
+            </div>
+            
+            <a href="../../index.html" style="margin-top:40px; color:#444; text-decoration:none; font-size:0.8rem;">Voltar ao Hub</a>
+        </section>
+
+        <section id="scene-waiting" class="lobby-container" style="display:none;">
+            <p>COMPARTILHE O CÓDIGO</p>
+            <div id="display-code" class="room-code-display">----</div>
+            <p style="font-size:0.8rem; color:#666;">Aguardando jogadores (Mín 2)...</p>
+            
+            <div id="waiting-list" style="margin:20px 0; width:100%; text-align:center;">
+                </div>
+
+            <button id="btn-start" class="orka-btn orka-btn-primary" disabled>Começar Jogo</button>
+        </section>
+
+        <section id="scene-game" style="display:none; height:100%;">
+            
+            <div class="game-status">
+                <span id="status-text">Sincronize suas mentes.</span>
+                <div id="round-counter" style="font-size:0.75rem; color:#444;">Rodada 1</div>
+            </div>
+
+            <div id="players-grid" class="players-grid">
+                </div>
+
+            <div class="game-footer">
+                <div class="word-input-container">
+                    <input type="text" id="word-input" placeholder="DIGITE SUA PALAVRA" autocomplete="off">
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script type="module" src="game.js"></script>
+
+</body>
+</html>

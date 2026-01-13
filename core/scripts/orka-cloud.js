@@ -76,6 +76,27 @@ async function updateNickname(newNickname) {
 }
 
 // =========================
+// IDIOMA
+// =========================
+
+function getLanguage() {
+  // Retorna 'pt-BR' se não houver nada salvo
+  return localStorage.getItem('orka_language') || 'pt-BR';
+}
+
+async function setLanguage(lang) {
+  if (lang !== 'pt-BR' && lang !== 'en-US') return; // Segurança básica
+  localStorage.setItem('orka_language', lang);
+
+  const playerId = getPlayerId();
+  
+  await supabase
+    .from('players')
+    .update({ language: lang })
+    .eq('id', playerId)
+}
+
+// =========================
 // SESSÕES
 // =========================
 
@@ -110,5 +131,8 @@ export const OrkaCloud = {
   startSession,
   endSession,
   getNickname,
-  updateNickname
+  updateNickname,
+  getLanguage,
+  setLanguage,
+  getPlayerId // Exportando caso precise usar direto na UI
 }
