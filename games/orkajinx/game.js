@@ -254,20 +254,19 @@ async function resetRound() {
     // 1. Host calcula nova rodada
     const nextRound = state.round + 1;
     
-    // 2. PEDIDO 7: Move current_word para last_word (Mágica do SQL no Javascript)
-    // Para evitar N requests, vamos iterar e fazer updates (Supabase não tem "Swap Columns" nativo num update em massa simples via JS SDK)
-    // Mas podemos fazer um update geral onde last_word recebe o valor antigo? Não facilmente via SDK JS sem procedure.
-    // Vamos fazer um loop rápido, para 2-4 jogadores é imperceptível.
-    
-    const updates = state.players.map(p => ({
-        id: p.id, // Supabase PK
-        is_ready: false,
-        last_word: p.current_word, // Copia palavra
-        current_word: ''           // Limpa
-    }));
+    // 2. Atualiza jogadores: Move current_word -> last_word e limpa status
+    // Usamos Promise.all para atualizar todos em paralelo (mais seguro que upsert parcial)
+    const updatePromises = state.players.map(p => {
+        return supabase.from('jinx_room_players')
+            .update({
+                is_ready: false,
+                last_word: p.current_word || '', // Salva a palavra atual como antiga
+                current_word: ''                 // Limpa a atual
+            })
+            .eq('id', p.id); // Usa o ID único da linha
+    });
 
-    // Upsert em massa funciona bem para updates se tiver PK
-    await supabase.from('jinx_room_players').upsert(updates);
+    await Promise.all(updatePromises);
 
     // 3. Atualiza Sala (Rodada + Palavras Usadas)
     await supabase.from('jinx_rooms')
