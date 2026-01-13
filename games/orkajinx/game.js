@@ -108,11 +108,13 @@ document.getElementById('btn-join').addEventListener('click', () => {
     joinRoom(code);
 });
 
-// Botão Sair (Regras Item 7 e Base Rules)
-document.getElementById('btn-leave').addEventListener('click', async () => {
-    if(confirm("Sair da sala?")) { // (Será substituído na próxima etapa)
-        await leaveRoomLogic();
-    }
+// Botão Sair (Substituindo confirm nativo)
+document.getElementById('btn-leave').addEventListener('click', () => {
+    openConfirmModal(
+        "SAIR DA SALA?", 
+        "Você voltará para o Hub e sairá desta partida.", 
+        async () => await leaveRoomLogic()
+    );
 });
 
 async function joinRoom(code) {
@@ -168,8 +170,17 @@ function subscribeToRoom() {
     const channel = supabase.channel(`room:${state.roomId}`);
     
     channel
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'jinx_room_players', filter: `room_id=eq.${state.roomId}` }, handlePlayerChange)
+        // ESCUTA INSERT/UPDATE COM FILTRO (Para eficiência)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'jinx_room_players', filter: `room_id=eq.${state.roomId}` }, handlePlayerChange)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'jinx_room_players', filter: `room_id=eq.${state.roomId}` }, handlePlayerChange)
+        
+        // ESCUTA DELETE SEM FILTRO DE ROOM_ID (Correção do Fantasma)
+        // O Supabase não manda o room_id no delete, então precisamos escutar tudo e filtrar no JS
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'jinx_room_players' }, handlePlayerChange)
+        
+        // Listener da Sala
         .on('postgres_changes', { event: '*', schema: 'public', table: 'jinx_rooms', filter: `id=eq.${state.roomId}` }, handleRoomChange) 
+        
         .subscribe((status) => { if (status === 'SUBSCRIBED') fetchPlayers(); });
 }
 
@@ -202,12 +213,18 @@ function handlePlayerChange(payload) {
         const index = state.players.findIndex(p => p.id === payload.new.id);
         if (index !== -1) state.players[index] = payload.new;
     } else if (payload.eventType === 'DELETE') {
-        // Remove da lista local (Atualiza tela dos demais - Regra Item 7)
-        state.players = state.players.filter(p => p.id !== payload.old.id);
+        // CORREÇÃO: Verifica se o ID deletado pertence à nossa sala
+        const playerExists = state.players.find(p => p.id === payload.old.id);
         
-        // Se FUI EU quem fui deletado (ex: kick ou erro), volto pro hub
-        if(payload.old.player_id === state.playerId) {
-            window.location.href = '../../index.html';
+        if (playerExists) {
+            // Remove da lista local
+            state.players = state.players.filter(p => p.id !== payload.old.id);
+            OrkaFX.toast(`${playerExists.nickname} saiu.`, 'default'); // Toast em vez de alert
+
+            // Se FUI EU quem fui deletado
+            if(payload.old.player_id === state.playerId) {
+                window.location.href = '../../index.html';
+            }
         }
     }
     
@@ -218,10 +235,13 @@ function handlePlayerChange(payload) {
 }
 
 function handleRoomChange(payload) {
-    // REGRAS BASE: Se a sala for deletada (Host saiu), todos saem
     if (payload.eventType === 'DELETE') {
-        alert('A sala foi encerrada.'); // (Alert temporário, toast na proxima etapa)
-        window.location.href = '../../index.html';
+        // A SALA FOI EXCLUÍDA
+        // Pequeno delay para o usuário ler antes de redirecionar
+        OrkaFX.toast('A sala foi encerrada pelo anfitrião.', 'warning');
+        setTimeout(() => {
+            window.location.href = '../../index.html';
+        }, 2000);
         return;
     }
     handleRoomUpdate(payload.new);
@@ -466,5 +486,38 @@ document.getElementById('btn-send-word').addEventListener('click', sendWord);
 document.getElementById('btn-start').addEventListener('click', async () => 
     await supabase.from('jinx_rooms').update({ status: 'playing' }).eq('id', state.roomId)
 );
+
+// --- UTILITÁRIOS DE MODAL ---
+const modalConfirm = document.getElementById('modal-confirm');
+const confirmTitle = document.getElementById('confirm-title');
+const confirmText = document.getElementById('confirm-text');
+const btnConfirmOk = document.getElementById('btn-confirm-ok');
+const btnConfirmCancel = document.getElementById('btn-confirm-cancel');
+
+function openConfirmModal(title, text, onConfirmAction) {
+    confirmTitle.innerText = title;
+    confirmText.innerText = text;
+    modalConfirm.style.display = 'flex';
+    setTimeout(() => modalConfirm.classList.add('active'), 10);
+
+    // Limpa eventos anteriores para não acumular
+    const newOk = btnConfirmOk.cloneNode(true);
+    const newCancel = btnConfirmCancel.cloneNode(true);
+    btnConfirmOk.parentNode.replaceChild(newOk, btnConfirmOk);
+    btnConfirmCancel.parentNode.replaceChild(newCancel, btnConfirmCancel);
+
+    // Reatribui
+    newOk.addEventListener('click', () => {
+        closeConfirmModal();
+        onConfirmAction();
+    });
+    
+    newCancel.addEventListener('click', closeConfirmModal);
+}
+
+function closeConfirmModal() {
+    modalConfirm.classList.remove('active');
+    setTimeout(() => modalConfirm.style.display = 'none', 300);
+}
 
 init();
