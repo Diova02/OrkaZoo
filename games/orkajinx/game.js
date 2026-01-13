@@ -49,7 +49,7 @@ async function init() {
 // --- UX: INPUT E TECLADO ---
 // (Lógica de autocomplete mantida igual, apenas garantindo funcionamento)
 inputs.word.addEventListener('input', () => {
-    const val = inputs.word.value.trim().toUpperCase();
+    const val = inputs.word.value.trim();
     state.suggestionIndex = -1;
     if (val.length < 1) { suggestionsBox.style.display = 'none'; return; }
     state.currentSuggestions = state.dictionary.filter(w => w.startsWith(val) && !state.usedWords.includes(w)).slice(0, 5); 
@@ -332,7 +332,7 @@ async function resetRound() {
 
 // --- ENVIO ---
 async function sendWord() {
-    const word = inputs.word.value.trim().toUpperCase();
+    const word = inputs.word.value.trim();
     if (!state.dictionary.includes(word)) return flashError();
     if (state.usedWords.includes(word)) { OrkaFX.toast('Palavra já utilizada!', 'error'); return flashError(); }
 

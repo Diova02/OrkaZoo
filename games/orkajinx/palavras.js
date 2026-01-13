@@ -91,7 +91,36 @@ export const palavrasPT = [
     "Panturrilha", "Canela", "Tornozelo", "Calcanhar", "Pé", "Planta", "Dorso", "Dedão", "Articulação", "Cartilagem",
     "Músculo", "Tendão", "Ligamento", "Pele", "Poros", "Veia", "Artéria", "Pulmão", "Coração", "Estômago",
     "Fígado", "Rim", "Intestino", "Esôfago", "Traqueia", "Laringe", "Diafragma", "Pâncreas", "Baço", "Bexiga",
-    "Cérebro", "Medula", "Nervo", "Glândula", "Hormônio", "Retina", "Íris", "Córnea", "Pupila", "Meninge"
+    "Cérebro", "Medula", "Nervo", "Glândula", "Hormônio", "Retina", "Íris", "Córnea", "Pupila", "Meninge",
+    //10. Música e instrumentos musicais
+    "Música", "Melodia", "Harmonia", "Ritmo", "Batida", "Tom", "Nota", "Acorde", "Escala", "Silêncio",
+    "Som", "Eco", "Volume", "Vibração", "Letra", "Refrão", "Verso", "Canção", "Álbum", "Concerto",
+    "Orquestra", "Banda", "Coral", "Maestro", "Cantor", "Cantora", "Compositor", "Intérprete", "Instrumentista", "Produtor",
+    "Piano", "Teclado", "Órgão", "Violino", "Viola", "Violoncelo", "Contrabaixo", "Guitarra", "Violão", "Baixo",
+    "Bateria", "Tambor", "Caixa", "Prato", "Xilofone", "Marimba", "Flauta", "Flautim", "Clarinete", "Oboé",
+    "Saxofone", "Trompete", "Trombone", "Tuba", "Corneta", "Gaita", "Acordeão", "Sanfona", "Bandolim", "Cavaquinho",
+    "Ukulele", "Harpa", "Lira", "Sitar", "Banjo", "Pandeiro", "Reco-reco", "Berimbau", "Atabaque", "Agogô",
+    //11. Relações humanas
+    "Amizade", "Inimizade", "Parceria", "Aliança", "Rivalidade", "Competição", "Cooperação", "Conflito", "Convívio", "Solidariedade",
+    "Amor", "Paixão", "Carinho", "Afeto", "Apego", "Distanciamento", "Separação", "União", "Casamento", "Divórcio",
+    "Família", "Parente", "Irmandade", "Paternidade", "Maternidade", "Filiação", "Tutela", "Adoção", "Cuidado", "Proteção",
+    "Amante", "Casal", "Companheiro", "Companheira", "Parceiro", "Parceira", "Ex-namorado", "Ex-namorada", "Crush", "Pretendente",
+    "Chefe", "Empregado", "Colega", "Sócio", "Cliente", "Fornecedor", "Líder", "Seguidor", "Mentor", "Aprendiz",
+    "Aliado", "Inimigo", "Traidor", "Cúmplice", "Testemunha", "Estranho", "Conhecido", "Vizinho", "Convidado", "Anfitrião",
+    //12. Tecnologia
+    "Tecnologia", "Máquina", "Sistema", "Dispositivo", "Aparelho", "Equipamento", "Ferramenta", "Mecanismo", "Circuito", "Processador",
+    "Computador", "Servidor", "Terminal", "Console", "Notebook", "Tablet", "Celular", "Smartphone", "Tela", "Monitor",
+    "Teclado", "Mouse", "Sensor", "Câmera", "Microfone", "Alto-falante", "Fone", "Bateria", "Carregador", "Cabo",
+    "Rede", "Internet", "Intranet", "Conexão", "Sinal", "Satélite", "Antena", "Nuvem", "Banco de dados", "Arquivo",
+    "Software", "Aplicativo", "Programa", "Algoritmo", "Código", "Script", "Interface", "Plataforma", "Sistema operacional", "Atualização",
+    "Firewall", "Criptografia", "Segurança", "Privacidade", "Vazamento", "Backup", "Automação", "Robô", "Inteligência artificial", "Simulação",
+    //13. Conceitos abstratos, morais e filosóficos
+    "Justiça", "Injustiça", "Verdade", "Mentira", "Bem", "Mal", "Ética", "Moral", "Virtude", "Pecado",
+    "Liberdade", "Opressão", "Direito", "Dever", "Responsabilidade", "Culpa", "Inocência", "Condenação", "Perdão", "Redenção",
+    "Vida", "Morte", "Nascimento", "Fim", "Começo", "Destino", "Acaso", "Escolha", "Consequência", "Sentido",
+    "Existência", "Consciência", "Identidade", "Ego", "Alma", "Espírito", "Vontade", "Desejo", "Intenção", "Propósito",
+    "Tempo", "Eternidade", "Infinito", "Vazio", "Nada", "Totalidade", "Caos", "Ordem", "Equilíbrio", "Ruptura",
+    "Apocalipse", "Colapso", "Criação", "Destruição", "Renovação", "Esperança", "Desespero", "Medo", "Coragem", "Fé"
 
 ];
 
@@ -186,5 +215,34 @@ export const palavrasEN = [
     "Calf", "Shin", "Ankle", "Heel", "Foot", "Sole", "Instep", "Big Toe", "Joint", "Cartilage",
     "Muscle", "Tendon", "Ligament", "Skin", "Pores", "Vein", "Artery", "Lung", "Heart", "Stomach",
     "Liver", "Kidney", "Intestine", "Esophagus", "Trachea", "Larynx", "Diaphragm", "Pancreas", "Spleen", "Bladder",
-    "Brain", "Spinal Cord", "Nerve", "Gland", "Hormone", "Retina", "Iris", "Cornea", "Pupil", "Meninges"
+    "Brain", "Spinal Cord", "Nerve", "Gland", "Hormone", "Retina", "Iris", "Cornea", "Pupil", "Meninges",
+    //10. Music and musical instruments
+    "Music", "Melody", "Harmony", "Rhythm", "Beat", "Tone", "Note", "Chord", "Scale", "Silence",
+    "Sound", "Echo", "Volume", "Vibration", "Lyrics", "Chorus", "Verse", "Song", "Album", "Concert",
+    "Orchestra", "Band", "Choir", "Conductor", "Singer", "Composer", "Performer", "Musician", "Producer", "Artist",
+    "Piano", "Keyboard", "Organ", "Violin", "Viola", "Cello", "Double Bass", "Guitar", "Acoustic Guitar", "Bass",
+    "Drums", "Drum", "Snare", "Cymbal", "Xylophone", "Marimba", "Flute", "Piccolo", "Clarinet", "Oboe",
+    "Saxophone", "Trumpet", "Trombone", "Tuba", "Cornet", "Harmonica", "Accordion", "Mandolin", "Ukulele", "Harp",
+    "Lyre", "Sitar", "Banjo", "Tambourine", "Berimbau", "Percussion", "Orchestration", "Improvisation", "Composition", "Arrangement",
+    //11. Human relationships
+    "Friendship", "Enmity", "Partnership", "Alliance", "Rivalry", "Competition", "Cooperation", "Conflict", "Bond", "Solidarity",
+    "Love", "Passion", "Affection", "Attachment", "Distance", "Separation", "Union", "Marriage", "Divorce", "Family",
+    "Relative", "Sibling", "Parenthood", "Motherhood", "Fatherhood", "Kinship", "Care", "Protection", "Support", "Trust",
+    "Lover", "Couple", "Companion", "Partner", "Ex", "Crush", "Suitor", "Boss", "Employee", "Colleague",
+    "Associate", "Client", "Supplier", "Leader", "Follower", "Mentor", "Apprentice", "Ally", "Enemy", "Traitor",
+    "Accomplice", "Witness", "Stranger", "Acquaintance", "Neighbor", "Guest", "Host", "Rival", "Mediator", "Opponent",
+    //12. Technology
+    "Technology", "Machine", "System", "Device", "Appliance", "Equipment", "Tool", "Mechanism", "Circuit", "Processor",
+    "Computer", "Server", "Terminal", "Console", "Laptop", "Tablet", "Phone", "Smartphone", "Screen", "Monitor",
+    "Keyboard", "Mouse", "Sensor", "Camera", "Microphone", "Speaker", "Headphones", "Battery", "Charger", "Cable",
+    "Network", "Internet", "Connection", "Signal", "Satellite", "Antenna", "Cloud", "Database", "File", "Storage",
+    "Software", "Application", "Program", "Algorithm", "Code", "Script", "Interface", "Platform", "Operating System", "Update",
+    "Firewall", "Encryption", "Security", "Privacy", "Leak", "Backup", "Automation", "Robot", "Artificial Intelligence", "Simulation",
+    //13. Abstract, moral and philosophical concepts
+    "Justice", "Injustice", "Truth", "Lie", "Good", "Evil", "Ethics", "Morality", "Virtue", "Sin",
+    "Freedom", "Oppression", "Right", "Duty", "Responsibility", "Guilt", "Innocence", "Judgment", "Forgiveness", "Redemption",
+    "Life", "Death", "Birth", "End", "Beginning", "Fate", "Chance", "Choice", "Consequence", "Meaning",
+    "Existence", "Consciousness", "Identity", "Ego", "Soul", "Spirit", "Will", "Desire", "Intention", "Purpose",
+    "Time", "Eternity", "Infinity", "Void", "Nothingness", "Totality", "Chaos", "Order", "Balance", "Rupture",
+    "Apocalypse", "Collapse", "Creation", "Destruction", "Renewal", "Hope", "Despair", "Fear", "Courage", "Faith"
 ];

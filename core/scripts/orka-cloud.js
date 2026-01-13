@@ -38,7 +38,7 @@ function getNickname() {
 async function registerPlayer(playerId) {
   await supabase
     .from('players')
-    .insert({ id: playerId })
+    .upsert({ id: playerId })
     .select()
     .maybeSingle()
 }
