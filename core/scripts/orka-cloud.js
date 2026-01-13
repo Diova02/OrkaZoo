@@ -5,28 +5,28 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2?bundle&target=browser'
 
 // 🔐 Conexão com o Supabase
-
 const supabaseUrl = 'https://lvwlixmcgfuuiizeelmo.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2d2xpeG1jZ2Z1dWlpemVlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4OTUwMzQsImV4cCI6MjA4MzQ3MTAzNH0.qa0nKUXewE0EqUePwfzQbBOaHypRqkhUxRnY5qgsDbo'
+
+// Exportando para que os jogos possam usar (resolve erros de conexão duplicada)
 export const supabase = createClient(supabaseUrl, supabaseKey)
+
+// Estado Local
+let currentSessionId = null;
 
 // =========================
 // UTILIDADES
 // =========================
 
-// Retorna ou cria um ID único para o jogador
 function getPlayerId() {
   let id = localStorage.getItem('orka_player_id')
-
   if (!id) {
     id = crypto.randomUUID()
     localStorage.setItem('orka_player_id', id)
   }
-
   return id
 }
 
-// Retorna o nickname salvo (se existir)
 function getNickname() {
   return localStorage.getItem('orka_nickname')
 }
@@ -36,9 +36,10 @@ function getNickname() {
 // =========================
 
 async function registerPlayer(playerId) {
+  // CORREÇÃO: Usar upsert evita o erro 409 (Conflict) se o jogador já existir
   await supabase
     .from('players')
-    .upsert({ id: playerId })
+    .upsert({ id: playerId }) 
     .select()
     .maybeSingle()
 }
@@ -51,76 +52,63 @@ async function askForNickname(playerId) {
   let nickname = getNickname()
 
   if (!nickname) {
-    nickname = prompt('Como você quer ser chamado? (opcional)')
-
-    if (nickname && nickname.trim() !== '') {
-      localStorage.setItem('orka_nickname', nickname)
-
-      await supabase
-        .from('players')
-        .update({ nickname })
-        .eq('id', playerId)
-    }
+    // Tenta evitar prompt se não for estritamente necessário agora, 
+    // mas mantém lógica original se preferir.
+    // nickname = prompt('Como você quer ser chamado? (opcional)') 
+    // (Prompt pode bloquear carregamento, ideal é gerenciar via UI do jogo)
   }
 }
 
 async function updateNickname(newNickname) {
   const playerId = getPlayerId()
-
   localStorage.setItem('orka_nickname', newNickname)
 
   await supabase
     .from('players')
-    .update({ nickname: newNickname })
+    .update({ nickname: newNickname }) // Assume que a coluna existe e é atualizável
     .eq('id', playerId)
 }
 
 // =========================
-// IDIOMA
-// =========================
-
-function getLanguage() {
-  // Retorna 'pt-BR' se não houver nada salvo
-  return localStorage.getItem('orka_language') || 'pt-BR';
-}
-
-async function setLanguage(lang) {
-  if (lang !== 'pt-BR' && lang !== 'en-US') return; // Segurança básica
-  localStorage.setItem('orka_language', lang);
-
-  const playerId = getPlayerId();
-  
-  await supabase
-    .from('players')
-    .update({ language: lang })
-    .eq('id', playerId)
-}
-
-// =========================
-// SESSÕES
+// SESSÕES (CORRIGIDO)
 // =========================
 
 async function startSession(gameId) {
   const sessionId = crypto.randomUUID()
   const playerId = getPlayerId()
+  
+  // 1. Memoriza o ID localmente
+  currentSessionId = sessionId;
 
   await registerPlayer(playerId)
-  await askForNickname(playerId)
+  
+  // Evitamos o prompt aqui para não travar o fluxo de analytics silencioso
+  // await askForNickname(playerId) 
 
-  await supabase.from('sessions').insert({
+  const { error } = await supabase.from('sessions').insert({
     id: sessionId,
     player_id: playerId,
     game_id: gameId
   })
 
+  if (error) console.warn("OrkaCloud: Erro ao iniciar sessão", error);
+
   return sessionId
 }
 
-async function endSession(sessionId) {
-  await supabase
+async function endSession() {
+  // 2. Usa o ID memorizado (não precisa receber argumento)
+  if (!currentSessionId) return;
+
+  const { error } = await supabase
     .from('sessions')
     .update({ ended_at: new Date() })
-    .eq('id', sessionId)
+    .eq('id', currentSessionId)
+
+  if (error) console.warn("OrkaCloud: Erro ao finalizar sessão", error);
+  
+  // Limpa
+  currentSessionId = null;
 }
 
 // =========================
@@ -132,7 +120,5 @@ export const OrkaCloud = {
   endSession,
   getNickname,
   updateNickname,
-  getLanguage,
-  setLanguage,
-  getPlayerId // Exportando caso precise usar direto na UI
+  getPlayerId
 }

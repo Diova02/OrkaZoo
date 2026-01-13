@@ -120,8 +120,34 @@ export const palavrasPT = [
     "Vida", "Morte", "Nascimento", "Fim", "Começo", "Destino", "Acaso", "Escolha", "Consequência", "Sentido",
     "Existência", "Consciência", "Identidade", "Ego", "Alma", "Espírito", "Vontade", "Desejo", "Intenção", "Propósito",
     "Tempo", "Eternidade", "Infinito", "Vazio", "Nada", "Totalidade", "Caos", "Ordem", "Equilíbrio", "Ruptura",
-    "Apocalipse", "Colapso", "Criação", "Destruição", "Renovação", "Esperança", "Desespero", "Medo", "Coragem", "Fé"
-
+    "Apocalipse", "Colapso", "Criação", "Destruição", "Renovação", "Esperança", "Desespero", "Medo", "Coragem", "Fé",
+    //14. Ferramentas manuais
+    "Martelo", "Marreta", "Malho", "Chave", "Chave inglesa", "Chave de fenda", "Chave Philips", "Alicate", "Alicate de corte", "Alicate de pressão",
+    "Serrote", "Arco de serra", "Lima", "Formão", "Plaina", "Trena", "Nível", "Esquadro", "Compasso", "Régua",
+    "Estilete", "Canivete", "Tesoura", "Grampo", "Sargento", "Morsa", "Punção", "Talhadeira", "Espátula", "Colher de pedreiro",
+    "Pá", "Enxada", "Picareta", "Ancinho", "Foice", "Machado", "Marreta de borracha", "Escova de aço", "Lixa", "Raspador",
+    //15. Máquinas
+    "Máquina", "Motor", "Gerador", "Compressor", "Torno", "Fresadora", "Prensa", "Esteira", "Elevador", "Guindaste",
+    "Escavadeira", "Retroescavadeira", "Trator", "Colheitadeira", "Betoneira", "Britadeira", "Perfuratriz", "Furadeira", "Parafusadeira", "Serra elétrica",
+    "Serra circular", "Serra de fita", "Serra mármore", "Politriz", "Lixadeira", "Plainadeira", "Soldadora", "Inversora", "Transformador", "Painel elétrico",
+    "Bomba", "Válvula", "Ventoinha", "Turbina", "Caldeira", "Reator", "Impressora 3D", "Robô industrial", "CNC", "Controlador",
+    //16. Construções
+    "Casa", "Prédio", "Edifício", "Apartamento", "Sobrado", "Galpão", "Armazém", "Fábrica", "Oficina", "Loja",
+    "Escola", "Hospital", "Clínica", "Igreja", "Templo", "Catedral", "Capela", "Castelo", "Fortaleza", "Palácio",
+    "Torre", "Ponte", "Viaduto", "Túnel", "Estrada", "Rodovia", "Barragem", "Dique", "Porto", "Aeroporto",
+    "Estação", "Terminal", "Estádio", "Ginásio", "Arena", "Teatro", "Cinema", "Museu", "Biblioteca", "Shopping",
+    "Mercado", "Feira", "Hotel", "Pousada", "Albergue", "Restaurante", "Bar", "Café", "Posto", "Garagem",
+    //17. Cômodos
+    "Sala", "Sala de estar", "Sala de jantar", "Quarto", "Dormitório", "Suíte", "Cozinha", "Copa", "Despensa", "Banheiro",
+    "Lavabo", "Área de serviço", "Lavanderia", "Escritório", "Biblioteca", "Ateliê", "Estúdio", "Closet", "Corredor", "Hall",
+    "Entrada", "Varanda", "Sacada", "Terraço", "Sótão", "Porão", "Adega", "Garagem", "Depósito", "Despacho",
+    "Quarto infantil", "Quarto de hóspedes", "Sala de jogos", "Sala de reuniões", "Sala técnica", "Central", "Almoxarifado", "Arquivo", "Antessala", "Camarim",
+    //18. Materiais de construção
+    "Concreto", "Cimento", "Areia", "Brita", "Argamassa", "Cal", "Gesso", "Reboco", "Massa corrida", "Asfalto",
+    "Tijolo", "Bloco", "Laje", "Viga", "Pilar", "Vergalhão", "Aço", "Ferro", "Alumínio", "Cobre",
+    "Madeira", "Compensado", "MDF", "OSB", "Plástico", "PVC", "Vidro", "Fibra", "Borracha", "Isolante",
+    "Telha", "Cerâmica", "Porcelanato", "Azulejo", "Granito", "Mármore", "Pedra", "Ardósia", "Quartzo", "Revestimento",
+    "Tinta", "Verniz", "Selador", "Impermeabilizante", "Cola", "Adesivo", "Parafuso", "Prego", "Bucha", "Argola"
 ];
 
 export const palavrasEN = [
@@ -244,5 +270,32 @@ export const palavrasEN = [
     "Life", "Death", "Birth", "End", "Beginning", "Fate", "Chance", "Choice", "Consequence", "Meaning",
     "Existence", "Consciousness", "Identity", "Ego", "Soul", "Spirit", "Will", "Desire", "Intention", "Purpose",
     "Time", "Eternity", "Infinity", "Void", "Nothingness", "Totality", "Chaos", "Order", "Balance", "Rupture",
-    "Apocalypse", "Collapse", "Creation", "Destruction", "Renewal", "Hope", "Despair", "Fear", "Courage", "Faith"
+    "Apocalypse", "Collapse", "Creation", "Destruction", "Renewal", "Hope", "Despair", "Fear", "Courage", "Faith",
+    //14. Hand tools
+    "Hammer", "Sledgehammer", "Mallet", "Wrench", "Adjustable Wrench", "Screwdriver", "Phillips Screwdriver", "Pliers", "Cutting Pliers", "Locking Pliers",
+    "Handsaw", "Hacksaw", "File", "Chisel", "Plane", "Tape Measure", "Level", "Square", "Compass", "Ruler",
+    "Utility Knife", "Pocket Knife", "Scissors", "Clamp", "C Clamp", "Vise", "Punch", "Cold Chisel", "Spatula", "Trowel",
+    "Shovel", "Hoe", "Pickaxe", "Rake", "Sickle", "Axe", "Rubber Mallet", "Wire Brush", "Sandpaper", "Scraper",
+    //15. Machines
+    "Machine", "Motor", "Engine", "Generator", "Compressor", "Lathe", "Milling Machine", "Press", "Conveyor", "Elevator",
+    "Crane", "Excavator", "Backhoe", "Tractor", "Harvester", "Concrete Mixer", "Crusher", "Drilling Machine", "Drill", "Screwdriver Machine",
+    "Electric Saw", "Circular Saw", "Band Saw", "Polisher", "Sander", "Planer", "Welding Machine", "Inverter", "Transformer", "Control Panel",
+    "Pump", "Valve", "Fan", "Turbine", "Boiler", "Reactor", "3D Printer", "Industrial Robot", "CNC Machine", "Controller",
+    //16. Buildings
+    "House", "Building", "Apartment", "Duplex", "Warehouse", "Factory", "Workshop", "Store", "School", "Hospital",
+    "Clinic", "Church", "Temple", "Cathedral", "Chapel", "Castle", "Fortress", "Palace", "Tower", "Bridge",
+    "Viaduct", "Tunnel", "Road", "Highway", "Dam", "Dike", "Port", "Airport", "Station", "Terminal",
+    "Stadium", "Gymnasium", "Arena", "Theater", "Cinema", "Museum", "Library", "Mall", "Market", "Fair",
+    "Hotel", "Inn", "Hostel", "Restaurant", "Bar", "Cafe", "Gas Station", "Garage", "Parking Structure", "Depot",
+    //17. Rooms
+    "Room", "Living Room", "Dining Room", "Bedroom", "Suite", "Kitchen", "Pantry", "Bathroom", "Restroom", "Laundry Room",
+    "Service Area", "Office", "Library", "Studio", "Workshop Room", "Closet", "Hallway", "Hall", "Entrance", "Balcony",
+    "Terrace", "Attic", "Basement", "Cellar", "Garage", "Storage Room", "Utility Room", "File Room", "Anteroom", "Dressing Room",
+    "Children Room", "Guest Room", "Game Room", "Meeting Room", "Control Room", "Technical Room", "Warehouse Room", "Archive", "Lobby", "Back Room",
+    //18. Construction materials
+    "Concrete", "Cement", "Sand", "Gravel", "Mortar", "Lime", "Plaster", "Stucco", "Putty", "Asphalt",
+    "Brick", "Block", "Slab", "Beam", "Column", "Rebar", "Steel", "Iron", "Aluminum", "Copper",
+    "Wood", "Plywood", "MDF", "OSB", "Plastic", "PVC", "Glass", "Fiber", "Rubber", "Insulation",
+    "Roof Tile", "Ceramic", "Porcelain Tile", "Tile", "Granite", "Marble", "Stone", "Slate", "Quartz", "Coating",
+    "Paint", "Varnish", "Sealer", "Waterproofing", "Glue", "Adhesive", "Screw", "Nail", "Wall Plug", "Ring"
 ];
