@@ -33,6 +33,19 @@ const inputs = {
     word: document.getElementById('word-input')
 };
 
+// --- UTILITÁRIOS DE TEXTO (A MÁGICA ACONTECE AQUI) ---
+
+// 1. Normaliza: Remove acentos e deixa minúsculo para COMPARAÇÃO
+function normalize(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+// 2. Formata: Deixa a primeira letra maiúscula e o resto minúsculo para EXIBIÇÃO
+function capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 const suggestionsBox = document.getElementById('suggestions-box');
 const modalVictory = document.getElementById('modal-victory');
 const btnPlayAgain = document.getElementById('btn-play-again');
@@ -47,22 +60,25 @@ async function init() {
 }
 
 // --- UX: INPUT E TECLADO ---
-// (Lógica de autocomplete mantida igual, apenas garantindo funcionamento)
-// --- UX: INPUT E TECLADO ---
 inputs.word.addEventListener('input', () => {
-    // Pega o valor original (preservando minúsculas visualmente)
-    const val = inputs.word.value.trim();
-    
+    const rawVal = inputs.word.value.trim();
     state.suggestionIndex = -1;
-    if (val.length < 1) { suggestionsBox.style.display = 'none'; return; }
-    
-    // MUDANÇA AQUI: .startsWith(val.toUpperCase())
-    // Compara o input transformado em maiúsculo com o dicionário (que já é maiúsculo)
-    // Assim: "abe" vira "ABE" e encontra "ABELHA"
+
+    if (rawVal.length < 1) { 
+        suggestionsBox.style.display = 'none'; 
+        return; 
+    }
+
+    const normVal = normalize(rawVal); // O que o usuário digitou (limpo)
+
+    // Filtra ignorando Case e Acentos
     state.currentSuggestions = state.dictionary
-        .filter(w => w.startsWith(val.toUpperCase()) && !state.usedWords.includes(w))
+        .filter(w => {
+            const normWord = normalize(w); // Palavra do banco (limpa)
+            return normWord.startsWith(normVal) && !state.usedWords.includes(w);
+        })
         .slice(0, 5); 
-    
+
     renderSuggestions(state.currentSuggestions);
 });
 
@@ -94,7 +110,10 @@ function updateSuggestionHighlight() {
 }
 
 function selectSuggestion(word) {
-    inputs.word.value = word; suggestionsBox.style.display = 'none'; state.suggestionIndex = -1; inputs.word.focus();
+    inputs.word.value = word; 
+    suggestionsBox.style.display = 'none'; 
+    state.suggestionIndex = -1; 
+    inputs.word.focus();
 }
 
 document.addEventListener('click', (e) => {
@@ -342,15 +361,42 @@ async function resetRound() {
 
 // --- ENVIO ---
 async function sendWord() {
-    const word = inputs.word.value.trim();
-    if (!state.dictionary.includes(word)) return flashError();
-    if (state.usedWords.includes(word)) { OrkaFX.toast('Palavra já utilizada!', 'error'); return flashError(); }
+    const rawInput = inputs.word.value.trim();
+    
+    // 1. Formata: Deixa "Bonito" (Ex: "ÁGUIA" -> "Águia")
+    let finalWord = capitalize(rawInput); 
 
+    // 2. Valida no Banco (Inteligente)
+    // Se a palavra formatada já existe no dicionário (match perfeito), ótimo.
+    const exactMatch = state.dictionary.includes(finalWord);
+    
+    if (!exactMatch) {
+        // Se não achou exato, tenta achar ignorando acentos (Ex: usuário digitou "aguia")
+        const normalizedInput = normalize(rawInput);
+        const looseMatch = state.dictionary.find(w => normalize(w) === normalizedInput);
+        
+        if (looseMatch) {
+            // ACHOU! Substitui o input do usuário pela palavra correta do banco
+            finalWord = looseMatch; 
+        } else {
+            // Não achou de jeito nenhum
+            OrkaFX.toast('Palavra desconhecida!', 'error');
+            return flashError();
+        }
+    }
+
+    // 3. Verifica se já foi usada
+    if (state.usedWords.includes(finalWord)) { 
+        OrkaFX.toast('Palavra já utilizada!', 'error'); 
+        return flashError(); 
+    }
+
+    // 4. Envia
     inputs.word.disabled = true;
     suggestionsBox.style.display = 'none';
 
     await supabase.from('jinx_room_players')
-        .update({ is_ready: true, current_word: word })
+        .update({ is_ready: true, current_word: finalWord })
         .eq('player_id', state.playerId).eq('room_id', state.roomId);
 }
 

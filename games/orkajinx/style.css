@@ -193,3 +193,49 @@ button:disabled, .orka-btn:disabled {
     margin: 0 auto; display: block;
     font-size: 1.1rem; font-weight: bold;
 }
+
+/* --- ANIMAÇÕES DE ENTRADA (GAME START) --- */
+
+/* Quando a tela de jogo aparece, anima os blocos principais */
+#scene-game .game-status {
+    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+#scene-game .players-grid {
+    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.1s; /* Entra um pouco depois */
+    opacity: 0; /* Começa invisível para o delay funcionar */
+}
+
+#scene-game .game-footer-fixed {
+    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.2s; /* Entra por último */
+    transform: translateY(100%); /* Garante que vem de baixo */
+    opacity: 0;
+}
+
+/* Redefinindo slideUp caso precise garantir o comportamento com opacity */
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- ANIMAÇÃO DE REVELAÇÃO (PULSAR) --- */
+
+@keyframes pulseReveal {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.3); text-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
+    100% { transform: scale(1); }
+}
+
+/* Aplica a animação na PALAVRA quando o card for revelado */
+.player-card.revealed .player-word-display {
+    animation: pulseReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    color: white; /* Garante destaque */
+}
+
+/* Opcional: Se for a palavra vencedora, pulsa em verde */
+.player-card.winner .player-word-display {
+    animation: pulseReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    color: var(--status-correct);
+}
