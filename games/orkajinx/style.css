@@ -353,3 +353,39 @@ button:disabled, .orka-btn:disabled {
     color: white;
     font-weight: bold;
 }
+
+/* --- AJUSTES MOBILE (RESPONSIVIDADE) --- */
+@media (max-width: 768px) {
+    /* Ajusta grid para não estourar */
+    .players-grid {
+        padding: 10px 10px 140px 10px; /* Mais espaço embaixo pro teclado */
+        gap: 15px;
+        grid-template-columns: repeat(2, 1fr); /* Força 2 colunas no celular */
+    }
+
+    /* Reduz cards para caber melhor */
+    .player-avatar {
+        width: 60px; height: 60px;
+        font-size: 0.8rem;
+    }
+
+    .player-nick { font-size: 0.9rem; }
+    .player-word-display { font-size: 1rem; }
+
+    /* Barra de input mais compacta */
+    .game-footer-fixed {
+        padding: 10px;
+    }
+    
+    #word-input {
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    /* Timer e Status menores */
+    .game-status { margin-bottom: 10px; }
+    .timer-box { font-size: 1rem; padding: 4px 10px; }
+    
+    /* Tutorial compacto */
+    .tutorial-card { margin-top: 10px; padding: 15px; }
+}

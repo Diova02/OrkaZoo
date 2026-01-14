@@ -286,17 +286,25 @@ function handleRoomChange(payload) {
 
 function handleRoomUpdate(roomData) {
     if (!roomData) return;
+    
+    // CORREÇÃO 1: Atualiza contador de rodadas
+    if (roomData.current_round) {
+        state.round = roomData.current_round; // Atualiza o estado local IMEDIATAMENTE
+        const roundCounter = document.getElementById('round-counter');
+        // Usa o valor direto do banco para garantir consistência visual
+        if(roundCounter) roundCounter.innerText = `RODADA ${roomData.current_round}`;
+    }
+
     if (roomData.used_words) state.usedWords = roomData.used_words;
     
     // Timer Sincronizado
     if (roomData.round_start_time) {
         state.roundStartTime = roomData.round_start_time;
         state.timeLimit = roomData.time_limit || 90;
-        // Só inicia o timer se o jogo estiver rolando
         if (roomData.status === 'playing') startLocalTimer();
     }
 
-    // --- GERENCIAMENTO DE ESTADOS ---
+    // Gerenciamento de Telas
     if (roomData.status === 'waiting') {
         modalVictory.classList.remove('active'); modalVictory.style.display = 'none';
         showScreen('waiting');
@@ -306,12 +314,9 @@ function handleRoomUpdate(roomData) {
         showScreen('game');
     } 
     else if (roomData.status === 'finished') {
-        // Vitória: Se não sou host, mostro modal (Host já chamou no finishGame)
         if (!state.isHost) showEndModal('win'); 
     }
     else if (roomData.status === 'timeout') {
-        // Derrota: Todos mostram modal (inclusive Host, pois foi via update)
-        // Pequena proteção para o Host não abrir 2x se a latência for baixa, mas mal não faz.
         showEndModal('loss');
     }
 }
@@ -362,7 +367,10 @@ async function checkGameLogic() {
 }
 
 async function resetRound() {
-    const nextRound = state.round + 1;
+    // CORREÇÃO 1: Garante que estamos pegando a rodada atual e somando +1
+    const nextRound = (state.round || 1) + 1;
+    
+    // Atualiza jogadores (Reseta palavras)
     const updatePromises = state.players.map(p => 
         supabase.from('jinx_room_players')
             .update({ is_ready: false, last_word: p.current_word || '', current_word: '' })
@@ -370,8 +378,13 @@ async function resetRound() {
     );
     await Promise.all(updatePromises);
 
+    // Atualiza a sala com a NOVA rodada e NOVO tempo
     await supabase.from('jinx_rooms')
-        .update({ used_words: state.usedWords, current_round: nextRound, round_start_time: new Date() })
+        .update({ 
+            used_words: state.usedWords, 
+            current_round: nextRound,
+            round_start_time: new Date() 
+        })
         .eq('id', state.roomId);
 }
 
@@ -531,11 +544,14 @@ async function resetGameRoom() {
     await Promise.all(updatePromises);
 }
 
-function startLocalTimer() {
-    // Limpa anterior se existir
-    if (state.timerInterval) clearInterval(state.timerInterval);
+// Variável de controle local para evitar múltiplos disparos
+let isTimeoutProcessing = false;
 
-    const timerDisplay = document.getElementById('timer-display'); // Vamos criar esse elemento no HTML
+function startLocalTimer() {
+    if (state.timerInterval) clearInterval(state.timerInterval);
+    isTimeoutProcessing = false; // Reseta a trava ao iniciar novo timer
+
+    const timerDisplay = document.getElementById('timer-display');
     if (!timerDisplay) return;
 
     state.timerInterval = setInterval(() => {
@@ -548,18 +564,22 @@ function startLocalTimer() {
 
         if (diff <= 0) {
             // TEMPO ESGOTADO!
-            clearInterval(state.timerInterval);
+            clearInterval(state.timerInterval); // Para o relógio local
             timerDisplay.innerText = "00:00";
             timerDisplay.classList.add('panic');
             
-            // Se eu ainda não enviei, travo tudo
+            // Trava inputs visuais imediatamente
             if (!inputs.word.disabled) {
                 inputs.word.disabled = true;
                 suggestionsBox.style.display = 'none';
-                OrkaFX.shake('game-app'); // Treme a tela toda
-                
-                // Host detecta o fim do tempo e declara derrota/reset
-                if (state.isHost) handleTimeOut(); 
+                OrkaFX.shake('game-app');
+            }
+
+            // CORREÇÃO 3: Lógica robusta para o Host disparar o fim
+            // Se eu sou Host E ainda não estamos processando um timeout...
+            if (state.isHost && !isTimeoutProcessing) {
+                isTimeoutProcessing = true; // Trava para não chamar 2x
+                handleTimeOut(); 
             }
         } else {
             // Formata MM:SS
@@ -567,7 +587,6 @@ function startLocalTimer() {
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
             timerDisplay.innerText = `${minutes < 10 ? '0'+minutes : minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
             
-            // Efeito visual (últimos 10s ficam vermelhos)
             if (diff < 10000) timerDisplay.classList.add('panic');
             else timerDisplay.classList.remove('panic');
         }
