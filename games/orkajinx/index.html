@@ -52,6 +52,40 @@
                 </div>
             </div>
 
+            <div class="tutorial-card">
+                <div class="tutorial-header">
+                    <span class="material-icons tutorial-icon">help_outline</span>
+                    <span class="lang-pt">COMO JOGAR</span>
+                    <span class="lang-en" style="display:none">HOW TO PLAY</span>
+                </div>
+
+                <div class="tutorial-steps">
+                    <div class="step-item">
+                        <span class="step-num">1</span>
+                        <div class="step-text">
+                            <span class="lang-pt">O objetivo é alcançar a <strong>Sincronia Mental</strong>. Todos devem digitar a mesma palavra.</span>
+                            <span class="lang-en" style="display:none">The goal is <strong>Mental Sync</strong>. Everyone must type the exact same word.</span>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-num">2</span>
+                        <div class="step-text">
+                            <span class="lang-pt">Se falharem, usem as palavras erradas como <strong>dica</strong> para a próxima rodada.</span>
+                            <span class="lang-en" style="display:none">If you miss, use the wrong words as a <strong>hint</strong> for the next round.</span>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-num">3</span>
+                        <div class="step-text">
+                            <span class="lang-pt">Ex: Se um disse "Água" e o outro "Madeira", a conexão pode ser "Barco" ou "Dique".</span>
+                            <span class="lang-en" style="display:none">Ex: If one said "Water" and the other "Wood", the link could be "Boat" or "Dike".</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
         <section id="scene-waiting" class="lobby-container" style="display:none;">
@@ -78,8 +112,10 @@
 
         <section id="scene-game" style="display:none; height:100%; flex-direction:column;">
             <div class="game-status">
-                <span id="status-text">SINCRONIA MENTAL</span>
+                <span id="status-text">JINX ONLINE</span>
                 <div id="round-counter" style="font-size:0.75rem; color:var(--orka-accent); margin-top:5px;">RODADA 1</div>
+                
+                <div id="timer-display" class="timer-box">01:30</div>
             </div>
 
             <div id="players-grid" class="players-grid"></div>

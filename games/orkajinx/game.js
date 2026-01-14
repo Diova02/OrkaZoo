@@ -18,7 +18,11 @@ let state = {
     
     // Teclado
     suggestionIndex: -1,
-    currentSuggestions: []
+    currentSuggestions: [],
+
+    timeLimit: 90,       // Padrão
+    roundStartTime: null,
+    timerInterval: null, // Para limpar o setInterval
 };
 
 // --- DOM ELEMENTS ---
@@ -125,7 +129,7 @@ document.addEventListener('click', (e) => {
 document.getElementById('btn-create').addEventListener('click', async () => {
     const code = Math.random().toString(36).substring(2, 6).toUpperCase();
     const { data, error } = await supabase.from('jinx_rooms')
-        .insert({ code, language: state.language, status: 'waiting', used_words: [], current_round: 1 })
+        .insert({ code, language: state.language, status: 'waiting', used_words: [], current_round: 1, time_limit: 90, round_start_time: new Date() })
         .select().single();
     
     if (error) return OrkaFX.toast('Erro ao criar sala', 'error');
@@ -283,20 +287,32 @@ function handleRoomChange(payload) {
 function handleRoomUpdate(roomData) {
     if (!roomData) return;
     if (roomData.used_words) state.usedWords = roomData.used_words;
-    if (roomData.current_round) {
-        state.round = roomData.current_round;
-        const roundCounter = document.getElementById('round-counter');
-        if(roundCounter) roundCounter.innerText = `RODADA ${state.round}`;
+    
+    // Timer Sincronizado
+    if (roomData.round_start_time) {
+        state.roundStartTime = roomData.round_start_time;
+        state.timeLimit = roomData.time_limit || 90;
+        // Só inicia o timer se o jogo estiver rolando
+        if (roomData.status === 'playing') startLocalTimer();
     }
 
+    // --- GERENCIAMENTO DE ESTADOS ---
     if (roomData.status === 'waiting') {
         modalVictory.classList.remove('active'); modalVictory.style.display = 'none';
         showScreen('waiting');
-    } else if (roomData.status === 'playing') {
+    } 
+    else if (roomData.status === 'playing') {
         modalVictory.classList.remove('active'); modalVictory.style.display = 'none';
         showScreen('game');
-    } else if (roomData.status === 'finished') {
-        if (!state.isHost) endGameUI(); 
+    } 
+    else if (roomData.status === 'finished') {
+        // Vitória: Se não sou host, mostro modal (Host já chamou no finishGame)
+        if (!state.isHost) showEndModal('win'); 
+    }
+    else if (roomData.status === 'timeout') {
+        // Derrota: Todos mostram modal (inclusive Host, pois foi via update)
+        // Pequena proteção para o Host não abrir 2x se a latência for baixa, mas mal não faz.
+        showEndModal('loss');
     }
 }
 
@@ -355,7 +371,7 @@ async function resetRound() {
     await Promise.all(updatePromises);
 
     await supabase.from('jinx_rooms')
-        .update({ used_words: state.usedWords, current_round: nextRound })
+        .update({ used_words: state.usedWords, current_round: nextRound, round_start_time: new Date() })
         .eq('id', state.roomId);
 }
 
@@ -407,6 +423,7 @@ function flashError() {
 
 // --- FIM DE JOGO ---
 async function finishGame(winningWord) {
+    // ... (salvamento do histórico mantém igual) ...
     await supabase.from('jinx_room_history').insert({
         code: state.roomCode, player_names: state.players.map(p => p.nickname),
         rounds_count: state.round, result: 'win'
@@ -416,7 +433,65 @@ async function finishGame(winningWord) {
         .update({ status: 'finished', used_words: state.usedWords })
         .eq('id', state.roomId);
     
-    endGameUI(winningWord);
+    // Host chama modal de vitória localmente
+    showEndModal('win', winningWord);
+}
+
+// Substitui a antiga endGameUI
+function showEndModal(type, word = null) {
+    // Para o timer visualmente
+    clearInterval(state.timerInterval);
+    const timerDisplay = document.getElementById('timer-display');
+    if(timerDisplay) timerDisplay.classList.add('panic');
+
+    // Elementos do Modal
+    const content = modalVictory.querySelector('.modal-content');
+    const icon = modalVictory.querySelector('.victory-icon');
+    const title = modalVictory.querySelector('.victory-title');
+    const subtitle = modalVictory.querySelector('.victory-subtitle');
+    const wordBox = document.getElementById('winning-word');
+    
+    // Configuração baseada no tipo
+    if (type === 'win') {
+        // --- MODO VITÓRIA ---
+        content.classList.remove('defeat-mode');
+        icon.innerText = "✨";
+        title.innerText = "JINX!";
+        subtitle.innerHTML = `Sincronia na rodada <span id="final-round">${state.round}</span>.`;
+        
+        // Descobre a palavra se não veio
+        let finalWord = word;
+        if (!finalWord && state.players.length > 0) finalWord = state.players[0].current_word;
+        wordBox.innerText = finalWord || "JINX!";
+        
+        // Confete só na vitória!
+        OrkaFX.confetti(); 
+        
+    } else {
+        // --- MODO DERROTA ---
+        content.classList.add('defeat-mode');
+        icon.innerText = "💀"; // Caveira ou Relógio ⏰
+        title.innerText = "TEMPO ESGOTADO!";
+        subtitle.innerHTML = `Sem sincronia na rodada <span id="final-round">${state.round}</span>.`;
+        wordBox.innerText = "TIMEOUT";
+        
+        // Sem confete :(
+    }
+
+    // Botões (Host vs Guest)
+    if (state.isHost) {
+        btnPlayAgain.textContent = "JOGAR NOVAMENTE";
+        btnPlayAgain.disabled = false;
+        // A função resetGameRoom já reseta para 'waiting', o que fecha o modal
+        btnPlayAgain.onclick = resetGameRoom; 
+    } else {
+        btnPlayAgain.textContent = "AGUARDANDO HOST...";
+        btnPlayAgain.disabled = true;
+    }
+
+    // Exibir
+    modalVictory.style.display = 'flex';
+    setTimeout(() => modalVictory.classList.add('active'), 10);
 }
 
 function endGameUI(word) {
@@ -454,6 +529,63 @@ async function resetGameRoom() {
             .eq('id', p.id)
     );
     await Promise.all(updatePromises);
+}
+
+function startLocalTimer() {
+    // Limpa anterior se existir
+    if (state.timerInterval) clearInterval(state.timerInterval);
+
+    const timerDisplay = document.getElementById('timer-display'); // Vamos criar esse elemento no HTML
+    if (!timerDisplay) return;
+
+    state.timerInterval = setInterval(() => {
+        if (!state.roundStartTime) return;
+
+        const now = new Date().getTime();
+        const start = new Date(state.roundStartTime).getTime();
+        const end = start + (state.timeLimit * 1000);
+        const diff = end - now;
+
+        if (diff <= 0) {
+            // TEMPO ESGOTADO!
+            clearInterval(state.timerInterval);
+            timerDisplay.innerText = "00:00";
+            timerDisplay.classList.add('panic');
+            
+            // Se eu ainda não enviei, travo tudo
+            if (!inputs.word.disabled) {
+                inputs.word.disabled = true;
+                suggestionsBox.style.display = 'none';
+                OrkaFX.shake('game-app'); // Treme a tela toda
+                
+                // Host detecta o fim do tempo e declara derrota/reset
+                if (state.isHost) handleTimeOut(); 
+            }
+        } else {
+            // Formata MM:SS
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            timerDisplay.innerText = `${minutes < 10 ? '0'+minutes : minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+            
+            // Efeito visual (últimos 10s ficam vermelhos)
+            if (diff < 10000) timerDisplay.classList.add('panic');
+            else timerDisplay.classList.remove('panic');
+        }
+    }, 1000);
+}
+
+// Lógica do Host quando o tempo acaba
+// Lógica do Host quando o tempo acaba
+async function handleTimeOut() {
+    clearInterval(state.timerInterval);
+    
+    // Atualiza o status da sala para 'timeout' (dispara o modal para todos)
+    await supabase.from('jinx_rooms')
+        .update({ status: 'timeout' }) 
+        .eq('id', state.roomId);
+        
+    // (Opcional) Salvar no histórico como derrota se quiser, mas por simplicidade:
+    // O Host verá o modal e decidirá se joga de novo.
 }
 
 // --- RENDERIZAÇÃO ---
@@ -530,16 +662,34 @@ function setupLanguageButtons() {
 function setLang(lang) {
     state.language = lang;
     state.dictionary = (lang === 'en-US') ? palavrasEN : palavrasPT;
+    
+    // Atualiza botões
     const btnPt = document.getElementById('btn-lang-pt');
     const btnEn = document.getElementById('btn-lang-en');
+    
     if (btnPt && btnEn) {
         const active = 'background:var(--orka-accent); color:white; border-color:var(--orka-accent);';
         const inactive = 'background:#111; color:#666; border-color:#333;';
         btnPt.style.cssText = lang === 'pt-BR' ? active : inactive;
         btnEn.style.cssText = lang === 'en-US' ? active : inactive;
     }
-}
 
+    // --- LÓGICA DO TUTORIAL (NOVO) ---
+    // Seleciona todos os elementos de texto
+    const ptEls = document.querySelectorAll('.lang-pt');
+    const enEls = document.querySelectorAll('.lang-en');
+
+    if (lang === 'pt-BR') {
+        ptEls.forEach(el => el.style.display = 'block'); // ou 'inline' dependendo do contexto, mas block funciona bem pra divs
+        enEls.forEach(el => el.style.display = 'none');
+    } else {
+        ptEls.forEach(el => el.style.display = 'none');
+        enEls.forEach(el => el.style.display = 'block');
+    }
+    
+    // Salva preferência no OrkaCloud se quiser persistir entre reloads
+    OrkaCloud.setLanguage(lang);
+}
 // Eventos
 if (inputs.word) inputs.word.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendWord(); });
 document.getElementById('btn-send-word').addEventListener('click', sendWord);

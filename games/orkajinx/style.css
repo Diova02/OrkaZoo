@@ -239,3 +239,117 @@ button:disabled, .orka-btn:disabled {
     animation: pulseReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     color: var(--status-correct);
 }
+
+.timer-box {
+    background: #222;
+    color: #fff;
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 5px 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #444;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+/* Quando faltar 10 segundos */
+.timer-box.panic {
+    background: #500;
+    color: #faa;
+    border-color: red;
+    animation: pulsePanic 0.5s infinite;
+}
+
+@keyframes pulsePanic {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* --- MODAL DE DERROTA (REUTILIZADO) --- */
+
+/* Quando o modal tem a classe .defeat-mode */
+.victory-content.defeat-mode {
+    border-color: var(--status-wrong); /* Vermelho */
+    box-shadow: 0 0 40px rgba(255, 50, 50, 0.2);
+}
+
+.victory-content.defeat-mode .victory-icon {
+    filter: grayscale(100%) brightness(0.8); /* Ícone mais apagado */
+}
+
+.victory-content.defeat-mode .victory-title {
+    color: var(--status-wrong);
+    font-size: 2.2rem; /* Um pouco menor para caber "O TEMPO ACABOU" */
+}
+
+.victory-content.defeat-mode .winning-word-box {
+    background: #222;
+    color: #666;
+    border: 1px solid #444;
+    text-decoration: line-through; /* Efeito de "cancelado" */
+}
+
+/* --- TUTORIAL CARD --- */
+.tutorial-card {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
+    background: rgba(17, 17, 17, 0.6); /* Mais transparente que o lobby */
+    border: 1px dashed #333; /* Borda tracejada para diferenciar */
+    border-radius: 16px;
+    padding: 20px;
+    animation: slideUp 0.6s ease-out 0.2s backwards; /* Entra depois do lobby */
+}
+
+.tutorial-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #888;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.tutorial-icon { font-size: 1.2rem; color: var(--orka-accent); }
+
+.tutorial-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.step-item {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.step-num {
+    background: #222;
+    color: var(--orka-accent);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    border: 1px solid #333;
+}
+
+.step-text {
+    font-size: 0.85rem;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.step-text strong {
+    color: white;
+    font-weight: bold;
+}
