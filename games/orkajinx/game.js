@@ -454,6 +454,15 @@ async function finishGame(winningWord) {
         .update({ status: 'finished', used_words: state.usedWords })
         .eq('id', state.roomId);
     
+    // NOVO ANALYTICS V3
+    OrkaCloud.endSession({
+        win: true,
+        rounds: state.round,
+        players_count: state.players.length,
+        winning_word: winningWord,
+        role: state.isHost ? 'host' : 'guest'
+    });
+
     // Host chama modal de vitória localmente
     showEndModal('win', winningWord);
 }
