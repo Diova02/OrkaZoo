@@ -448,6 +448,50 @@ export const palavrasPT = [
     "Videocassete", "DVD", "Blu-ray", "Walkman", "Discman", "MP3", "iPod", "Bipe", "Pager", "Fax",
     "Máquina de Datilografar", "Toca-discos", "Vinil", "Fita Cassete", "Disquete", "CD", "Pen Drive", "HD Externo", "Cartão de Memória", "Nuvem",
     "Smartwatch", "Drone", "VR", "Impressora 3D", "Robô", "Assistente Virtual", "Alexa", "Siri", "Google Home", "Chatbot",
+    // 66. Circo e Espetáculo
+    "Circo", "Lona", "Picadeiro", "Arquibancada", "Bilheteria", "Pipoca", "Algodão Doce", "Maçã do Amor", "Espetáculo", "Aplausos",
+    "Palhaço", "Mágico", "Malabarista", "Trapezista", "Contorcionista", "Domador", "Equilibrista", "Atirador de Facas", "Engolidor de Espadas", "Mimico",
+    "Monociclo", "Perna de Pau", "Globo da Morte", "Corda Bamba", "Trampolim", "Cama Elástica", "Canhão", "Rede", "Trapézio", "Bambolê",
+    "Cartola", "Varinha", "Coelho", "Pombo", "Carta", "Lenço", "Truque", "Ilusão", "Fantasia", "Maquiagem",
+    "Nariz Vermelho", "Sapatos Grandes", "Peruca", "Buzina", "Flor que espirra água", "Torta na cara", "Risada", "Sombra", "Marionete", "Fantoche",
+
+    // 67. Culinária Japonesa e Asiática
+    "Sushi", "Sashimi", "Temaki", "Niguiri", "Uramaki", "Hossomaki", "Hot Roll", "Joe", "Ceviche", "Carpaccio",
+    "Yakisoba", "Lamen", "Udon", "Guioza", "Harumaki", "Rolinho Primavera", "Tempurá", "Teppan", "Robata", "Poke",
+    "Shimeji", "Shitake", "Missoshiro", "Tofu", "Gohan", "Arroz Japonês", "Alga", "Nori", "Gergelim", "Cebolinha",
+    "Salmão", "Peixe Branco", "Polvo", "Lula", "Camarão", "Kani", "Ova", "Cream Cheese", "Pepino",
+    "Wasabi", "Gengibre", "Shoyu", "Agridoce", "Tarê", "Teriyaki", "Saquê", "Sorte","Trevo","Azar",
+    "Hashi", "Pauzinhos", "Nozinhos", "Barca", "Rodízio", "Esteira", "Sudare", "Faca Japonesa", "Cerâmica", "Bambu",
+
+    // 68. Frutos do Mar e Peixes (Específicos)
+    "Camarão", "Lagostim", "Ostra", "Mexilhão", "Vieira", "Vôngole", "Marisco",
+    "Polvo", "Lula", "Água-viva", "Caviar", "Ouriço", "Estrela-do-mar", "Coral", "Anêmona", "Marinha",
+    "Bacalhau", "Tilápia", "Robalo", "Tainha", "Dourado", "Pintado", "Pacu",
+    "Tambaqui", "Pirarucu", "Truta", "Linguado", "Namorado", "Badejo", "Pargo", "Garoupa", "Cavala", "Arenque",
+    "Anchova", "Peixe-espada", "Peixe-palhaço", "Raia", "Moreia", "Baiacu", "Piranha", "Lambari",
+
+    // 69. Higiene Pessoal e Banheiro (Identifiquei Escassez aqui)
+    "Escova de Dentes", "Pasta de Dente", "Creme Dental", "Fio Dental", "Enxaguante", "Sabonete", "Shampoo", "Condicionador", "Creme de Pentear", "Gel",
+    "Desodorante", "Perfume", "Colônia", "Hidratante", "Protetor Solar", "Repelente", "Talco", "Pomada", "Cotonete", "Algodão",
+    "Papel Higiênico", "Lenço Umedecido", "Absorvente", "Coletor Menstrual", "Fralda", "Lâmina", "Barbeador", "Espuma de Barbear", "Pós-barba", "Pinça",
+    "Cortador de Unha", "Lixa", "Esmalte", "Acetona", "Removedor", "Secador", "Chapinha", "Babyliss", "Pente", "Escova de Cabelo",
+    "Toalha", "Roupão", "Touca", "Esponja", "Bucha", "Cesto", "Privada", "Vaso Sanitário", "Pia", "Chuveiro",
+    "Banheira", "Torneira", "Ralo", "Espelho", "Box", "Cortina", "Tapete", "Lixeira", "Descarga", "Assento",
+
+    // 70. Fazenda e Vida Rural (Identifiquei Escassez de estrutura)
+    "Fazenda", "Sítio", "Chácara", "Rancho", "Horta", "Pomar", "Plantação", "Lavoura", "Pasto", "Curral",
+    "Celeiro", "Silo", "Galinheiro", "Chiqueiro", "Cocheira", "Estábulo", "Aprisco", "Viveiro", "Tanque", "Açude",
+    "Cerca", "Arame Farpado", "Porteira", "Mata-burro", "Estrada de Terra", "Trilha", "Ponte", "Moinho", "Catavento", "Poço",
+    "Trator", "Arado", "Colheitadeira", "Carroça", "Charrete", "Carrinho de Mão", "Enxada", "Pá", "Foice", "Facão",
+    "Espantalho", "Sela", "Ferradura", "Cabresto", "Rédea", "Chicote", "Berrante", "Viola", "Fogueira", "Rede",
+    "Leite", "Queijo Fresco", "Coalhada", "Doce de Leite", "Ovo Caipira", "Galinha Caipira", "Torresmo", "Linguiça", "Feijão Tropeiro", "Café",
+
+    // 71. Opostos e Contrastes (Conceitos que geram match rápido)
+    "Dia", "Noite", "Claro", "Escuro", "Preto", "Branco", "Alto", "Baixo", "Gordo", "Magro",
+    "Grande", "Pequeno", "Gigante", "Anão", "Quente", "Frio", "Céu", "Inferno", "Bem", "Mal",
+    "Rico", "Pobre", "Jovem", "Velho", "Novo", "Usado", "Vida", "Morte", "Começo", "Fim",
+    "Entrada", "Saída", "Aberto", "Fechado", "Cheio", "Vazio", "Tudo", "Nada", "Sempre", "Nunca",
+    "Verdade", "Mentira", "Amor", "Ódio", "Guerra", "Paz", "Sol", "Lua", "Terra", "Mar",
 
     //Mix
     "Boneco de neve", "Mamona", "Zumbi","Esqueleto","Tumba",

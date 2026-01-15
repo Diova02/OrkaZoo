@@ -192,15 +192,24 @@ async function leaveRoomLogic() {
     }
     
     // Redireciona para Hub
-    window.location.href = '../../index.html'; 
+    window.location.href = 'index.html'; 
 }
 
-// Cleanup ao fechar aba
-window.addEventListener('beforeunload', () => {
-    // V3: Não precisa passar ID, ele já sabe qual é a sessão ativa.
-    // Enviamos apenas um metadata vazio ou reason para saber que fechou a aba.
+window.onbeforeunload = () => {
     OrkaCloud.endSession({ reason: 'tab_closed' });
-});
+    
+    if (state.roomId) {
+        if (state.isHost) {
+            // Tenta deletar a sala antes de morrer
+            // O uso de 'then' é importante para não travar, mas o navegador pode matar antes.
+            // O ideal para garantir 100% seria usar navigator.sendBeacon, mas o supabase-js não suporta direto.
+            // Esta é a melhor tentativa via JS padrão:
+            supabase.from('jinx_rooms').delete().eq('id', state.roomId).then();
+        } else {
+            supabase.from('jinx_room_players').delete().eq('player_id', state.playerId).then();
+        }
+    }
+};
 
 // --- REALTIME ---
 function subscribeToRoom() {
@@ -260,7 +269,7 @@ function handlePlayerChange(payload) {
 
             // Se FUI EU quem fui deletado
             if(payload.old.player_id === state.playerId) {
-                window.location.href = '../../index.html';
+                window.location.href = 'index.html';
             }
         }
     }
@@ -269,6 +278,18 @@ function handlePlayerChange(payload) {
     renderPlayers();
     checkMyStatus();
     checkGameLogic(); 
+
+    // --- NOVO: Atualiza UI do Modal de Vitória em tempo real ---
+    const modalActive = document.getElementById('modal-victory').classList.contains('active');
+    if (modalActive && state.isHost) {
+        if (state.players.length < 2) {
+            btnPlayAgain.disabled = true;
+            btnPlayAgain.textContent = "AGUARDANDO JOGADORES...";
+        } else {
+            btnPlayAgain.disabled = false;
+            btnPlayAgain.textContent = "JOGAR NOVAMENTE";
+        }
+    }
 }
 
 function handleRoomChange(payload) {
@@ -277,7 +298,7 @@ function handleRoomChange(payload) {
         // Pequeno delay para o usuário ler antes de redirecionar
         OrkaFX.toast('A sala foi encerrada pelo anfitrião.', 'warning');
         setTimeout(() => {
-            window.location.href = '../../index.html';
+            window.location.href = 'index.html';
         }, 2000);
         return;
     }
@@ -356,14 +377,16 @@ async function checkGameLogic() {
                 await finishGame(words[0]);
             }, 800); // Reduzido de 1500 para 800ms
         } else {
-            // Mismatch
-            setTimeout(async () => {
-                const newWords = words.filter(w => !state.usedWords.includes(w));
-                state.usedWords.push(...newWords); 
-                await resetRound();
-            }, 1500);
-        }
-    }
+            // 1. Salva as palavras usadas (para não repetir na próxima)
+            const newWords = words.filter(w => !state.usedWords.includes(w));
+            state.usedWords.push(...newWords); 
+
+            // 2. Espera 5 segundos (Jogadores veem o erro)
+            setTimeout(() => {
+                // 3. Mostra o botão para o Host
+                showNextRoundButton();
+            }, 5000);
+        }}
 }
 
 async function resetRound() {
@@ -443,11 +466,6 @@ async function finishGame(winningWord) {
         rounds: state.round,
         players: state.players.length,
         role: state.isHost ? 'host' : 'guest'
-    });
-
-    await supabase.from('jinx_room_history').insert({
-        code: state.roomCode, player_names: state.players.map(p => p.nickname),
-        rounds_count: state.round, result: 'win'
     });
 
     await supabase.from('jinx_rooms')
@@ -549,6 +567,15 @@ function endGameUI(word) {
 }
 
 async function resetGameRoom() {
+    // Verifica se ainda tem gente suficiente
+    if (state.players.length < 2) {
+        OrkaFX.toast("Jogadores insuficientes para reiniciar!", "error");
+        // Opcional: Desabilita o botão visualmente
+        btnPlayAgain.disabled = true;
+        btnPlayAgain.textContent = "AGUARDANDO JOGADORES...";
+        return; 
+    }
+
     await supabase.from('jinx_rooms')
         .update({ status: 'waiting', used_words: [], current_round: 1 }) 
         .eq('id', state.roomId);
@@ -566,11 +593,12 @@ let isTimeoutProcessing = false;
 
 function startLocalTimer() {
     if (state.timerInterval) clearInterval(state.timerInterval);
-    isTimeoutProcessing = false; // Reseta a trava ao iniciar novo timer
+    isTimeoutProcessing = false;
 
     const timerDisplay = document.getElementById('timer-display');
     if (!timerDisplay) return;
 
+    // MUDANÇA: Intervalo de 1000ms -> 250ms (4x mais rápido para precisão)
     state.timerInterval = setInterval(() => {
         if (!state.roundStartTime) return;
 
@@ -581,33 +609,35 @@ function startLocalTimer() {
 
         if (diff <= 0) {
             // TEMPO ESGOTADO!
-            clearInterval(state.timerInterval); // Para o relógio local
+            clearInterval(state.timerInterval); 
             timerDisplay.innerText = "00:00";
             timerDisplay.classList.add('panic');
             
-            // Trava inputs visuais imediatamente
+            // Trava inputs imediatamente
             if (!inputs.word.disabled) {
                 inputs.word.disabled = true;
                 suggestionsBox.style.display = 'none';
                 OrkaFX.shake('game-app');
             }
 
-            // CORREÇÃO 3: Lógica robusta para o Host disparar o fim
-            // Se eu sou Host E ainda não estamos processando um timeout...
+            // O Host dispara o Game Over no DB
             if (state.isHost && !isTimeoutProcessing) {
-                isTimeoutProcessing = true; // Trava para não chamar 2x
+                isTimeoutProcessing = true; 
                 handleTimeOut(); 
             }
         } else {
-            // Formata MM:SS
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            // Apenas atualiza o visual (sem lógica pesada aqui)
+            // Arredonda para cima para não mostrar 00:00 quando ainda tem 0.9s
+            const totalSeconds = Math.ceil(diff / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
             timerDisplay.innerText = `${minutes < 10 ? '0'+minutes : minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
             
             if (diff < 10000) timerDisplay.classList.add('panic');
             else timerDisplay.classList.remove('panic');
         }
-    }, 1000);
+    }, 250); // <--- Checa 4 vezes por segundo
 }
 
 // Lógica do Host quando o tempo acaba
@@ -764,6 +794,57 @@ function openConfirmModal(title, text, onConfirmAction) {
 function closeConfirmModal() {
     modalConfirm.classList.remove('active');
     setTimeout(() => modalConfirm.style.display = 'none', 300);
+}
+
+// --- HELPER: Botão de Próxima Rodada Dinâmico ---
+function showNextRoundButton() {
+    // Cria o botão visualmente
+    const btn = document.createElement('button');
+    btn.id = 'btn-next-round-dynamic';
+    btn.innerText = "PRÓXIMA RODADA (5)";
+    btn.className = 'orka-btn orka-btn-primary';
+    
+    // Estilo Flutuante Centralizado
+    btn.style.cssText = `
+        position: fixed; 
+        bottom: 15%; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        z-index: 9999; 
+        padding: 15px 40px; 
+        font-size: 1.1rem; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        border: 2px solid white;
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    `;
+    
+    document.body.appendChild(btn);
+
+    let countdown = 5;
+    let autoTimer = null;
+
+    // Função de Avanço
+    const goNext = () => {
+        clearInterval(autoTimer);
+        if(btn) btn.remove(); // Remove o botão da tela
+        resetRound(); // Chama a função original de resetar
+    };
+
+    // Clique Manual
+    btn.onclick = () => {
+        OrkaFX.playClick(); // Barulhinho se tiver
+        goNext();
+    };
+
+    // Contagem Regressiva Automática
+    autoTimer = setInterval(() => {
+        countdown--;
+        if (btn) btn.innerText = `PRÓXIMA RODADA (${countdown})`;
+        
+        if (countdown <= 0) {
+            goNext();
+        }
+    }, 1000);
 }
 
 init();
