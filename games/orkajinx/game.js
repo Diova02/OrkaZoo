@@ -385,7 +385,7 @@ async function checkGameLogic() {
             setTimeout(() => {
                 // 3. Mostra o botão para o Host
                 showNextRoundButton();
-            }, 5000);
+            }, 1500);
         }}
 }
 
@@ -797,25 +797,54 @@ function closeConfirmModal() {
 }
 
 // --- HELPER: Botão de Próxima Rodada Dinâmico ---
+// --- HELPER: Botão de Próxima Rodada (Corrigido) ---
 function showNextRoundButton() {
-    // Cria o botão visualmente
+    // Remove anterior se houver (segurança)
+    const oldBtn = document.getElementById('btn-next-round-dynamic');
+    if (oldBtn) oldBtn.remove();
+
+    // Injeta estilo de animação se não existir
+    if (!document.getElementById('anim-popin-style')) {
+        const style = document.createElement('style');
+        style.id = 'anim-popin-style';
+        style.innerHTML = `
+            @keyframes popInElastic {
+                0% { transform: translateX(-50%) scale(0); opacity: 0; }
+                60% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+                100% { transform: translateX(-50%) scale(1); opacity: 1; }
+            }
+            .btn-next-glow {
+                background: linear-gradient(135deg, var(--orka-accent), #4a90e2);
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+                transition: transform 0.1s;
+            }
+            .btn-next-glow:active { transform: translateX(-50%) scale(0.95); }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Cria o botão
     const btn = document.createElement('button');
     btn.id = 'btn-next-round-dynamic';
-    btn.innerText = "PRÓXIMA RODADA (5)";
-    btn.className = 'orka-btn orka-btn-primary';
+    // Adiciona ícone para ficar menos seco
+    btn.innerHTML = `<span class="material-icons" style="vertical-align:middle; margin-right:5px;">fast_forward</span> PRÓXIMA (5)`;
+    btn.className = 'orka-btn btn-next-glow';
     
-    // Estilo Flutuante Centralizado
+    // Estilo Flutuante
     btn.style.cssText = `
         position: fixed; 
         bottom: 15%; 
         left: 50%; 
         transform: translateX(-50%); 
         z-index: 9999; 
-        padding: 15px 40px; 
+        padding: 12px 30px; 
         font-size: 1.1rem; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        border-radius: 50px;
         border: 2px solid white;
-        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        animation: popInElastic 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     `;
     
     document.body.appendChild(btn);
@@ -826,20 +855,20 @@ function showNextRoundButton() {
     // Função de Avanço
     const goNext = () => {
         clearInterval(autoTimer);
-        if(btn) btn.remove(); // Remove o botão da tela
-        resetRound(); // Chama a função original de resetar
+        btn.style.opacity = '0'; // Feedback visual de saída
+        setTimeout(() => { if(btn) btn.remove(); }, 200);
+        resetRound(); 
     };
 
-    // Clique Manual
+    // Clique Manual (CORRIGIDO: Sem OrkaFX.playClick)
     btn.onclick = () => {
-        OrkaFX.playClick(); // Barulhinho se tiver
         goNext();
     };
 
-    // Contagem Regressiva Automática
+    // Contagem Regressiva
     autoTimer = setInterval(() => {
         countdown--;
-        if (btn) btn.innerText = `PRÓXIMA RODADA (${countdown})`;
+        btn.innerHTML = `<span class="material-icons" style="vertical-align:middle; margin-right:5px;">fast_forward</span> PRÓXIMA (${countdown})`;
         
         if (countdown <= 0) {
             goNext();
