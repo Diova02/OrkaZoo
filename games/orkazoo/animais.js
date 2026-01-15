@@ -175,15 +175,14 @@ export default [
     { "nome": { "pt": "Calopsita", "en": "Cockatiel" }, "peso": 0.1, "dieta": "Herbivoro", "habitat": ["aereo"], "continentes": ["Oceania", "America", "Europa"], "classe": "Ave", "populacao": "Milhões", "vida": 15, "ciclo": "Diurno" },
     { "nome": { "pt": "Furão", "en": "Ferret" }, "peso": 1.5, "dieta": "Carnivoro", "habitat": ["terrestre"], "continentes": ["Europa", "America"], "classe": "Mamifero", "populacao": "Milhões", "vida": 8, "ciclo": "Crepuscular" },
     { "nome": { "pt": "Chinchila", "en": "Chinchilla" }, "peso": 0.6, "dieta": "Herbivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Mamifero", "populacao": "Milhares", "vida": 15, "ciclo": "Crepuscular" },
-    { "nome": { "pt": "Iguana", "en": "Green Iguana" }, "peso": 5, "dieta": "Herbivoro", "habitat": ["terrestre", "aereo"], "continentes": ["America"], "classe": "Reptil", "populacao": "Milhões", "vida": 15, "ciclo": "Diurno" },
+    { "nome": { "pt": "Iguana", "en": "Green Iguana" }, "peso": 5, "dieta": "Herbivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Reptil", "populacao": "Milhões", "vida": 15, "ciclo": "Diurno" },
     { "nome": { "pt": "Ema", "en": "Rhea" }, "peso": 25, "dieta": "Onivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Ave", "populacao": "Milhares", "vida": 20, "ciclo": "Diurno" },
     { "nome": { "pt": "Quati", "en": "Coati" }, "peso": 5, "dieta": "Onivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Mamifero", "populacao": "Milhões", "vida": 10, "ciclo": "Diurno" },
     { "nome": { "pt": "Ariranha", "en": "Giant Otter" }, "peso": 26, "dieta": "Carnivoro", "habitat": ["aquatico", "terrestre"], "continentes": ["America"], "classe": "Mamifero", "populacao": "Milhares", "vida": 12, "ciclo": "Diurno" },
     { "nome": { "pt": "Jaguatirica", "en": "Ocelot" }, "peso": 11, "dieta": "Carnivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Mamifero", "populacao": "Milhões", "vida": 12, "ciclo": "Noturno" },
     { "nome": { "pt": "Peixe-boi", "en": "Manatee" }, "peso": 500, "dieta": "Herbivoro", "habitat": ["aquatico"], "continentes": ["America", "Africa"], "classe": "Mamifero", "populacao": "Milhares", "vida": 40, "ciclo": "Diurno" },
     { "nome": { "pt": "Jiboia", "en": "Boa Constrictor" }, "peso": 27, "dieta": "Carnivoro", "habitat": ["terrestre", "aereo"], "continentes": ["America"], "classe": "Reptil", "populacao": "Milhões", "vida": 25, "ciclo": "Noturno" },
-    { "nome": { "pt": "Lince", "en": "Lynx" }, "peso": 20, "dieta": "Carnivoro", "habitat": ["terrestre"], "continentes": ["Europa", "Asia", "America"], "classe": "Mamifero", "populacao": "Milhares", "vida": 15, "ciclo": "Crepuscular" },
-    { "nome": { "pt": "Caititu", "en": "Collared Peccary" }, "peso": 25, "dieta": "Herbivoro", "habitat": ["terrestre"], "continentes": ["America"], "classe": "Mamifero", "populacao": "Milhões", "vida": 15, "ciclo": "Diurno" }  
+    { "nome": { "pt": "Lince", "en": "Lynx" }, "peso": 20, "dieta": "Carnivoro", "habitat": ["terrestre"], "continentes": ["Europa", "Asia", "America"], "classe": "Mamifero", "populacao": "Milhares", "vida": 15, "ciclo": "Crepuscular" }
     //Até aqui há 184 animais. O que é sufiente para ~6 meses e 4 dias de jogos sem repetição. (partindo de 01/12/2025)
     //Caso você adicione animais após esse tempo, atualize a const CHECKPOINTS no script.js
     //Obrigado.

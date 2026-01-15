@@ -362,7 +362,7 @@ input.addEventListener("keydown", function(e) {
 });
 
 function addActive(items) {
-    if (!items) return false;
+    if (!items || items.length === 0) return false;
     for (let i = 0; i < items.length; i++) items[i].classList.remove("active");
     if (currentFocus >= items.length) currentFocus = 0;
     if (currentFocus < 0) currentFocus = (items.length - 1);
@@ -492,6 +492,13 @@ let emojiHistory = [];
 // FUNÇÃO DE COMPARTILHAMENTO (NOVA)
 // ==========================================
 window.shareResult = function() {
+    
+    //trackeamento
+    OrkaCloud.track('share_result', 'conversion', {
+        win: gameState.isGameOver,
+        platform: 'whatsapp_or_copy'
+    });
+
     const dateStr = gameState.currentDate.toLocaleDateString('pt-BR');
     const attemptStr = gameState.isGameOver && gameState.guessedNames.has(gameState.targetAnimal.nome.pt) ? gameState.attemptsCount : "X";
     
