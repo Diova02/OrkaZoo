@@ -18,13 +18,29 @@
 }
 
 /* HEADER */
+/* styles.css */
 header {
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--orka-border);
+    /* Fixar no topo */
+    position: sticky;
+    top: 0;
+    z-index: 100; /* Garante que fique acima dos jogos */
+
+    /* Efeito de Vidro (Glassmorphism) */
+    background: rgba(15, 23, 42, 0.85); /* Cor do fundo com transparência */
+    backdrop-filter: blur(12px); /* O desfoque mágico */
+    -webkit-backdrop-filter: blur(12px); /* Suporte para Safari/iOS */
+    
+    /* Borda sutil embaixo para separar do conteúdo */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    
+    /* Manter espaçamentos existentes */
+    padding: 15px 0;
     width: 100%;
-    background: rgba(5,5,5,0.95);
-    margin-bottom: 20px;
+
+    padding-bottom: 15px;
 }
+
 .header-content {
     max-width: 900px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
@@ -50,7 +66,9 @@ h1 { margin: 0; font-size: 1.1rem; letter-spacing: 2px; }
 /* Reset Básico */
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
-    background-color: var(--orka-bg); color: var(--orka-text);
+    background: linear-gradient(315deg,var(--orka-bg) 30%,#0c162e 100%);
+    background-attachment: fixed; /* Importante para não cortar no scroll */
+    color: var(--orka-text);
     margin: 0; padding: 0; min-height: 100vh; display: flex;
     flex-direction: column; align-items: center; 
 }

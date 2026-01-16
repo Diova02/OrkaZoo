@@ -24,115 +24,37 @@
                 <h1>ORKA STUDIO</h1>
             </div>
             <div class="right-group">
-                <div class="right-group">
-                    <button id="btn-profile" class="icon-btn" title="Configurar Perfil">
-                        <span class="material-icons">person</span>
-                    </button>
+                <div class="bolo-counter" title="Seus Bolos">
+                    <span class="material-icons" style="color:#ffcc00; font-size:1.2rem; margin-right:4px;">cake</span>
+                    <span id="header-bolo-count">0</span>
                 </div>
+                <button id="btn-profile" class="icon-btn" title="Configurar Perfil">
+                    <span class="material-icons">person</span>
+                </button>
             </div>
         </div>
     </header>
 
     <main>
-
-        <section class="hub-section">
-            <h2>Jogos Diários</h2>
-            <div class="game-list">
-                
-                <a href="games/orkazoo/" class="game-card-horizontal">
-                    <img src="assets/prints/print-zoo.png" alt="Orka Zoo" class="card-print" onerror="this.src='assets/icons/orka-logo.png'"> 
-                    
-                    <div class="card-content">
-                        <div class="card-info-top">
-                            <img src="assets/icons/zoo-logo.png" class="card-icon" alt="Z" onerror="this.style.background='#333'">
-                            <div class="card-text"><h3>ORKA ZOO</h3><p>Descubra o animal do dia.</p></div>
-                        </div>
-                        <div class="card-action"><span class="material-icons">play_arrow</span></div>
-                    </div></a>
-                <!-- ADICIONE JOGOS NOVOS AQUI -->
-
-            </div>
+    <section class="hub-section">
+            <h2 data-t="dailyGames">Jogos Diários</h2> 
+            <div id="list-daily" class="game-list"></div> 
         </section>
 
         <section class="hub-section">
-            <h2>Jogos Web</h2>
-
-            <a href="games/orkajinx/" class="game-card-horizontal">
-                    <img src="assets/prints/print-jinx.png" alt="Orka Jinx" class="card-print" onerror="this.src='assets/icons/orka-logo.png'"> 
-                    
-                    <div class="card-content">
-                        <div class="card-info-top">
-                            <img src="assets/icons/jinx-logo.png" class="card-icon" alt="J" onerror="this.style.background='#333'">
-                            <div class="card-text"><h3>ORKA JINX</h3><p>Leia a mente alheia.</p></div>
-                        </div>
-                        <div class="card-action"><span class="material-icons">play_arrow</span></div>
-                    </div></a>
-                <!-- ADICIONE JOGOS NOVOS AQUI -->
-
+            <h2 data-t="webGames">Jogos Web</h2>
+            <div id="list-web" class="game-list"></div>
         </section>
 
         <section class="hub-section">
-            <h2>PnP</h2>
-            <div class="game-list"><div class="empty-msg">Nada aqui ainda!</div></div>
+            <h2 data-t="pnpGames">PnP</h2>
+            <div id="list-pnp" class="game-list"><div class="empty-msg" data-t="emptyMsg">Nada aqui ainda!</div></div>
         </section>
 
         <section class="hub-section">
-            <h2>Nos próximos episódios...</h2>
-            <div class="game-list">
-                
-                <div class="game-card-horizontal" style="opacity: 0.5; cursor: default;">
-                    <div class="card-print" style="display:flex; align-items:center; justify-content:center; color:#444;">🚧</div>
-                    <div class="card-content">
-                        <div class="card-info-top">    
-                        <div class="card-text">
-                            <h3>LISTIT</h3>
-                            <p>Deduza a ordem.</p>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div class="game-card-horizontal" style="opacity: 0.5; cursor: default;">
-                    <div class="card-print" style="display:flex; align-items:center; justify-content:center; color:#444;">🚧</div>
-                    <div class="card-content">
-                        <div class="card-info-top">    
-                        <div class="card-text">
-                            <h3>DISCOMANIA</h3>
-                            <p>Descubra a música do dia.</p>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="game-card-horizontal" style="opacity: 0.5; cursor: default;">
-                    <div class="card-print" style="display:flex; align-items:center; justify-content:center; color:#444;">🚧</div>
-                    <div class="card-content">
-                        <div class="card-info-top">    
-                        <div class="card-text">
-                            <h3>EAGLE AIM</h3>
-                            <p>Atire o mais rápido que conseguir.</p>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div class="game-card-horizontal" style="opacity: 0.5; cursor: default;">
-                    <div class="card-print" style="display:flex; align-items:center; justify-content:center; color:#444;">🚧</div>
-                    <div class="card-content">
-                        <div class="card-info-top">    
-                        <div class="card-text">
-                            <h3>FIREWALL</h3>
-                            <p>Construa o canhão mais poderoso!</p>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+            <h2 data-t="soonGames">Nos próximos episódios...</h2>
+            <div id="list-soon" class="game-list"></div>
         </section>
-
     </main>
 
     <footer style="text-align: center; color: #444; padding: 40px; font-size: 0.8rem;">
@@ -142,7 +64,7 @@
     <div id="modal-profile" class="modal-overlay">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; font-size:1.2rem; color:var(--orka-accent);">PERFIL</h2>
+                <h2 style="margin:0; font-size:1.2rem; color:var(--orka-accent);" data-t="profileTitle">PERFIL</h2>
                 <button id="btn-close-profile" class="icon-btn" style="border:none;"><span class="material-icons">close</span></button>
             </div>
 
@@ -155,7 +77,7 @@
             </div>
 
         <div class="profile-section">
-            <label>Seu Apelido</label>
+            <label data-t="nickLabel">Seu Apelido</label>
             
             <div id="view-nick-mode" class="nick-container">
                 <span id="display-nick" class="nick-text">...</span>
@@ -169,15 +91,18 @@
             </div>
             
             <button id="btn-add-nick" class="orka-btn orka-btn-primary" 
-                style="display:none; margin: 15px auto; width: auto; padding: 12px 30px; min-width: 150px;">
+                style="display:none; margin: 15px auto; width: auto; padding: 12px 30px; min-width: 150px; ">
                 Adicionar Nickname
+            </button>
+            <button id="btn-welcome-ready" class="orka-btn orka-btn-primary" style="display:none; width:100%; margin-top:15px; padding:15px;">
+                Tudo pronto!
             </button>
         </div>
 
         <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
 
         <div class="profile-section">
-            <label>Idioma / Language</label>
+            <label data-t="langLabel">Idioma / Language</label>
             <div class="lang-selector">
                 <button class="lang-option selected" data-lang="pt-BR">
                     🇧🇷 Português
@@ -186,7 +111,7 @@
                     🇺🇸 English
                 </button>
             </div>
-            <p style="font-size:0.75rem; color:#666; margin-top:5px;">
+            <p style="font-size:0.75rem; color:#666; margin-top:5px;" data-t="langDesc">
                 Jogos usarão esta preferência automaticamente.
             </p>
         </div>

@@ -58,14 +58,12 @@
 
 /* O Card em si */
 .game-card-horizontal {
-    /* Fixando tamanhos */
-    min-width: 240px; /* Largura fixa (importante usar min-width para não esmagar) */
+    min-width: 240px;
     width: 240px;
-    height: 180px;    /* Altura fixa */
+    height: 180px; /* Altura fixa do card */
     
-    /* Layout interno */
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Garante: Imagem em Cima, Texto Embaixo */
     background: #0f0f0f;
     border: 1px solid var(--orka-border);
     border-radius: 12px;
@@ -74,10 +72,17 @@
     overflow: hidden;
     transition: all 0.3s ease;
     position: relative;
-    
-    /* Garante que o item não encolha no flex container */
     flex-shrink: 0;
-    scroll-snap-align: start; /* Alinha à esquerda ao soltar o scroll */
+    scroll-snap-align: start;
+}
+
+.card-print {
+    width: 100%;
+    height: 110px; /* <--- AJUSTADO: Deixa 70px para o texto, antes era 200px */
+    background-color: #1a1a1a;
+    object-fit: cover;
+    border-bottom: 1px solid #222;
+    transition: filter 0.3s;
 }
 
 /* Efeito Hover */
@@ -87,16 +92,6 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.7);
     z-index: 2;
     height: 230px;
-}
-
-/* Área da Imagem Principal (Print) */
-.card-print {
-    width: 100%;
-    height: 200px; /* Aumentei um pouco a área da imagem */
-    background-color: #1a1a1a;
-    object-fit: cover;
-    border-bottom: 1px solid #222;
-    transition: filter 0.3s;
 }
 
 .game-card-horizontal:hover .card-print {
@@ -327,4 +322,52 @@ main{
 .profile-avatar-box .material-icons {
     font-size: 48px; /* Tamanho grande do ícone */
     color: #666;     /* Cinza discreto para silhueta */
+}
+
+/* Container do avatar com fundo pulsante (Skeleton Loading) */
+.profile-avatar-box {
+    /* Mantenha suas propriedades existentes e adicione/garanta: */
+    background-color: #222;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Classe para animação enquanto carrega */
+.profile-avatar-box.loading::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.bolo-counter {
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-right: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.tag-new {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff0055; /* Cor chamativa */
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 10;
 }
