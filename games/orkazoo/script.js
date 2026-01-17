@@ -525,7 +525,7 @@ window.shareResult = function() {
         }
     });
 
-    text += "\nJogue em: orka-zoo.vercel.app"; // Seu link aqui
+    text += "\nJogue em: orka-hub.vercel.app"; // Seu link aqui
 
     navigator.clipboard.writeText(text).then(() => {
         OrkaFX.toast(t("shareMsg"), "success");

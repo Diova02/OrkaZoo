@@ -241,6 +241,66 @@ async function track(eventName, type = 'interaction', data = {}) {
     }
 }
 
+// Retorna o Top 10 de um jogo em uma data específica
+async function getLeaderboard(gameId, dateObj = new Date()) {
+    const dateStr = dateObj.toISOString().split('T')[0];
+    
+    // Faz join com a tabela 'players' para pegar o nickname
+    const { data, error } = await supabase
+        .from('leaderboards')
+        .select(`score, player_id, players(nickname)`) 
+        .eq('game_id', gameId)
+        .eq('played_at', dateStr)
+        .order('score', { ascending: true }) // Ascendente: Menor tempo vence
+        .limit(10);
+
+    if (error) {
+        console.error("Erro Leaderboard:", error);
+        return [];
+    }
+    
+    // Formata o retorno
+    return data.map(entry => ({
+        nickname: entry.players?.nickname || 'Anônimo',
+        score: entry.score,
+        isMe: entry.player_id === state.userId
+    }));
+}
+
+// Envia o score (O banco já trata o "Upsert" graças à constraint unique)
+async function submitScore(gameId, score, dateObj = new Date()) {
+    if (!state.userId) await initAuth(); // Garante login (anônimo ou real)
+    
+    const dateStr = dateObj.toISOString().split('T')[0];
+
+    // Primeiro, verificamos se já existe um score MELHOR (menor) hoje
+    const { data: current } = await supabase
+        .from('leaderboards')
+        .select('score')
+        .eq('game_id', gameId)
+        .eq('player_id', state.userId)
+        .eq('played_at', dateStr)
+        .maybeSingle();
+
+    // Se já existe um tempo menor gravado, não faz nada
+    if (current && current.score <= score) {
+        return { success: true, newRecord: false };
+    }
+
+    // Se não existe ou o novo é melhor, faz o UPSERT
+    const { error } = await supabase
+        .from('leaderboards')
+        .upsert({ 
+            game_id: gameId, 
+            player_id: state.userId, 
+            score: score,
+            played_at: dateStr
+        }, { onConflict: 'game_id, player_id, played_at' });
+
+    if (error) return { error: error.message };
+    return { success: true, newRecord: true };
+}
+
 // Helpers
 function logAdImpression(adId, adType) { track('ad_impression', 'ad_impression', { ad_id: adId, ad_type: adType }); }
 function logAdClick(adId, adType) { track('ad_click', 'ad_click', { ad_id: adId, ad_type: adType }); }
@@ -266,5 +326,7 @@ export const OrkaCloud = {
     getUserId: () => state.userId,
     // NOVOS EXPORTS
     registerAccount, loginAccount, logout,
-    isRegistered: () => state.profile.is_registered
+    isRegistered: () => state.profile.is_registered,
+    getLeaderboard,
+    submitScore
 };

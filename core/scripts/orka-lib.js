@@ -117,3 +117,120 @@ export const Utils = {
         if(show) el.classList.add('active'); else el.classList.remove('active');
     }
 };
+
+// --- 5. MÓDULO MATEMÁTICO (NOVO) ---
+export const OrkaMath = {
+    // Algoritmo Mulberry32: Rápido e determinístico
+    createSeededRNG: (seed) => {
+        return function() {
+            var t = seed += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        }
+    },
+
+    // Gera semente baseada na data (YYYYMMDD)
+    getDateSeed: (dateObj = new Date()) => {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return parseInt(`${y}${m}${d}`);
+    }
+};
+
+// --- 6. MÓDULO DE ÁUDIO (NOVO) ---
+export const OrkaAudio = {
+    sounds: {},
+    
+    // Carrega os sons para memória
+    load: (soundMap) => {
+        for (const [key, path] of Object.entries(soundMap)) {
+            const audio = new Audio(path);
+            audio.preload = 'auto'; // Tenta carregar imediatamente
+            OrkaAudio.sounds[key] = audio;
+        }
+    },
+
+    // Toca o som (com suporte a rapid-fire)
+    play: (key, volume = 1.0) => {
+        const original = OrkaAudio.sounds[key];
+        if (!original) return;
+
+        // Clona o nó de áudio para permitir sons simultâneos (ex: 3 tiros rápidos)
+        const clone = original.cloneNode();
+        clone.volume = volume;
+        clone.play().catch(e => console.warn("Audio bloqueado pelo navegador (interaja primeiro)"));
+    }
+};
+
+// --- 7. MÓDULO DE CALENDÁRIO UI (NOVO) ---
+export const OrkaCalendar = {
+    // Renderiza o grid dentro de um container
+    render: (containerId, labelId, dateRef, config = {}) => {
+        const grid = document.getElementById(containerId);
+        const label = document.getElementById(labelId);
+        if(!grid || !label) return;
+
+        grid.innerHTML = "";
+        
+        const year = dateRef.getFullYear();
+        const month = dateRef.getMonth();
+        
+        // Atualiza título do mês (Ex: "Janeiro 2026")
+        label.textContent = dateRef.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Configurações padrão
+        const { 
+            minDate = '2024-01-01', 
+            onClick = null,
+            getDayClass = null // Função para retornar classes extras (win, lose, etc)
+        } = config;
+
+        // Dias vazios do início
+        for(let i=0; i<firstDay; i++) {
+            const div = document.createElement('div');
+            div.className = 'calendar-day empty';
+            grid.appendChild(div);
+        }
+
+        // Dias do mês
+        for(let d=1; d<=daysInMonth; d++) {
+            const div = document.createElement('div');
+            div.className = 'calendar-day';
+            div.textContent = d;
+            
+            const isoDate = new Date(year, month, d).toISOString().split('T')[0];
+            
+            // Verifica status customizado (Ex: se ganhou ou perdeu)
+            if (getDayClass) {
+                const extraClass = getDayClass(isoDate);
+                if (extraClass) {
+                    // CORREÇÃO: Divide a string por espaços e adiciona as classes individualmente
+                    const classes = extraClass.trim().split(/\s+/);
+                    if (classes[0]) div.classList.add(...classes);
+                }
+            }
+            // Lógica de Bloqueio
+            if (isoDate < minDate || isoDate > todayStr) {
+                div.classList.add('disabled');
+            } else {
+                // Dia Ativo (Hover e Click)
+                div.onclick = () => {
+                    if(div.classList.contains('disabled')) return;
+                    if(onClick) onClick(new Date(year, month, d));
+                };
+            }
+            
+            // Marca o dia selecionado visualmente
+            // (Nota: dateRef é a data do Mês que estamos vendo, não necessariamente a selecionada. 
+            // Para simplificar, quem chama deve passar a classe 'active-date' via getDayClass se quiser)
+            
+            grid.appendChild(div);
+        }
+    }
+};

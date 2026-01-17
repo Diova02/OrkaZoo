@@ -1,6 +1,16 @@
 import { OrkaCloud } from './core/scripts/orka-cloud.js';
 import { OrkaFX } from './core/scripts/orka-lib.js'; // Importando FX para o Toast
 
+export const gamesList = [
+    { id: 'zoo', type: 'daily', title: 'ORKA ZOO', descKey: 'game_zoo_desc', icon: 'zoo-logo.png', print: 'print-zoo.png', url: 'games/orkazoo/', releaseDate: '2026-01-05', active: true }, // Exemplo: data passada
+    { id: 'jinx', type: 'web', title: 'ORKA JINX', descKey: 'game_jinx_desc', icon: 'jinx-logo.png', print: 'print-jinx.png', url: 'games/orkajinx/', releaseDate: '2026-01-13', active: true },
+    { id: 'eagle', type: 'web', title: 'EAGLE AIM', descKey: 'game_eagle_desc', icon: 'eagle-logo.png', print: 'print-eagle.png', url: 'games/eagleaim/', releaseDate: '2026-01-17', active: true },
+    // Jogos em breve (active: false)
+    { id: 'listit', type: 'soon', title: 'LISTIT', descKey: 'game_listit_desc', icon: null, print: null, url: '#', active: false },
+    { id: 'disco', type: 'soon', title: 'DISCOMANIA', descKey: 'game_disco_desc', icon: null, print: null, url: '#', active: false },
+    { id: 'firewall', type: 'soon', title: 'FIREWALL', descKey: 'game_firewall_desc', icon: null, print: null, url: '#', active: false }
+];
+
 // --- DADOS DO HUB (TRADUÇÃO + JOGOS) ---
 export const translations = {
     'pt': {
@@ -12,7 +22,6 @@ export const translations = {
         nickLabel: "Seu Apelido",
         langLabel: "Idioma / Language",
         langDesc: "Jogos usarão esta preferência automaticamente.",
-        readyBtn: "Tudo pronto, {nick}!", addNick: "Adicionar Nickname",
         
         game_zoo_desc: "Descubra o animal do dia.",
         game_jinx_desc: "Leia a mente alheia.",
@@ -39,16 +48,6 @@ export const translations = {
         game_firewall_desc: "Grind your powerfull channon."
     }
 };
-
-export const gamesList = [
-    { id: 'zoo', type: 'daily', title: 'ORKA ZOO', descKey: 'game_zoo_desc', icon: 'zoo-logo.png', print: 'print-zoo.png', url: 'games/orkazoo/', releaseDate: '2026-01-05', active: true }, // Exemplo: data passada
-    { id: 'jinx', type: 'web', title: 'ORKA JINX', descKey: 'game_jinx_desc', icon: 'jinx-logo.png', print: 'print-jinx.png', url: 'games/orkajinx/', releaseDate: '2026-01-13', active: true },
-    // Jogos em breve (active: false)
-    { id: 'listit', type: 'soon', title: 'LISTIT', descKey: 'game_listit_desc', icon: null, print: null, url: '#', active: false },
-    { id: 'disco', type: 'soon', title: 'DISCOMANIA', descKey: 'game_disco_desc', icon: null, print: null, url: '#', active: false },
-    { id: 'eagle', type: 'soon', title: 'EAGLE AIM', descKey: 'game_eagle_desc', icon: null, print: null, url: '#', active: false },
-    { id: 'firewall', type: 'soon', title: 'FIREWALL', descKey: 'game_firewall_desc', icon: null, print: null, url: '#', active: false }
-];
 
 // --- ELEMENTOS DO DOM ---
 const modal = document.getElementById('modal-profile');

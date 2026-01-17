@@ -1,0 +1,296 @@
+/* =========================
+   EAGLE AIM - STYLE.CSS (FINAL V0.2)
+   ========================= */
+
+body {
+    background: #000;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- 1. FUNDO GLOBAL & EFEITOS --- */
+
+/* Fundo que cobre tudo (inclusive bordas laterais em telas wide) */
+#global-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    /* Gradiente padrão (Escuro) */
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Quando o jogo começa (Amarelo Vibrante) */
+body.game-mode #global-bg {
+    background: radial-gradient(circle at center, #facc15 0%, #ca8a04 100%);
+}
+
+/* Camada de Manchas (Splats) */
+#splat-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+}
+/* 2. NOVAS MANCHAS (Splats + Respingos) */
+/* A mancha principal fica mais escura/irregular */
+.splat {
+    position: absolute;
+    width: 50px; height: 50px;
+    background: rgba(0,0,0,0.5); /* Mais escuro */
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; /* Formato orgânico */
+    transform: translate(-50%, -50%) scale(0);
+    animation: splatEnter 0.15s forwards;
+}
+
+/* Os respingos ao redor */
+.splat-droplet {
+    position: absolute;
+    background: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: splatEnter 0.2s forwards;
+}
+
+/* Animação do toque na tela (Ripple) */
+.touch-ripple {
+    position: fixed;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: rippleAnim 0.4s ease-out forwards;
+    z-index: 999;
+}
+
+/* --- 2. HEADER & UI FIXA --- */
+
+/* Ajuste para centralizar o título independente dos ícones laterais */
+header {
+    position: relative; /* Necessário para o absolute do título funcionar */
+    z-index: 500;
+}
+
+.header-content {
+    /* Mantém layout flex mas permite sobreposição do título */
+    position: relative; 
+    justify-content: space-between;
+}
+
+/* Força o título a ficar exatamente no meio da barra */
+/* --- ADICIONE/ATUALIZE ESTES BLOCOS NO CSS --- */
+
+/* 1. HEADER CORRIGIDO */
+.title-group {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: auto;
+    white-space: nowrap;
+    /* Removemos margens antigas se houver */
+    margin: 0;
+}
+
+/* Ajustes do Calendário */
+.compact-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 10px; margin-bottom: 10px;
+}
+.calendar-nav { display: flex; gap: 5px; }
+#calendar-month-year { margin: 0; font-size: 1.1rem; }
+
+/* --- 3. CONTAINER DO JOGO --- */
+
+#game-wrapper {
+    width: 100vw;
+    height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent; /* Transparente para ver o #global-bg */
+}
+
+#game-stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    max-height: 100%;
+    max-width: 177.78vh; /* Limita largura baseada na altura (16/9) */
+    overflow: visible; /* Permite que alvos/efeitos vazem um pouco se necessário */
+}
+
+/* --- 4. TELAS DE ESTADO (Menu, Jogo, Contagem) --- */
+
+.game-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 10;
+}
+.game-layer.active { display: flex; }
+
+/* MENU */
+#screen-menu {
+    /* Fundo levemente escuro para destacar botões */
+    background: rgba(0,0,0,0.2); 
+    color: white;
+}
+
+/* 3. BOTÃO JOGAR (Discreto e Arredondado) */
+.big-play-btn {
+    font-size: 1.2rem; /* Menor */
+    padding: 12px 40px;
+    letter-spacing: 1px;
+    border-radius: 50px; /* Bem redondo */
+    background: #fff;
+    color: #000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Sombra sutil, sem glow */
+    border: none;
+    transition: transform 0.2s, opacity 0.2s;
+    animation: none; /* Remove a pulsação 'breath' */
+    margin-top: 15px;
+}
+.big-play-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.big-score {
+    font-size: 4rem; font-weight: 900; color: var(--orka-accent);
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin: 10px 0;
+}
+.best-score-display {
+    font-size: 1.5rem; color: #facc15; font-weight: bold; margin-top: 5px;
+}
+
+/* CONTAGEM */
+#countdown-text {
+    font-size: 15vw; font-weight: 900; color: #facc15;
+    text-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- 5. GAMEPLAY HUD & ELEMENTOS --- */
+
+#timer-hud {
+    position: absolute; top: 2%; right: 2%;
+    font-size: 3vw; font-weight: bold; color: #fff;
+    text-shadow: 2px 2px 0 #000; font-family: monospace;
+    pointer-events: none;
+}
+
+/* Trazendo de volta o mostrador de ondas */
+#wave-hud {
+    position: absolute; top: 2%; left: 2%;
+    font-size: 2vw; font-weight: bold; color: rgba(255,255,255,0.9);
+    text-shadow: 1px 1px 0 #000;
+    pointer-events: none;
+}
+
+/* --- 6. ALVOS & INTERAÇÃO --- */
+
+#targets-container { 
+    width: 100%; height: 100%; 
+    pointer-events: none; /* Container ignora cliques... */
+}
+
+.target {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 5.6%; /* Tamanho calibrado */
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 0.25vw solid white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    cursor: crosshair;
+    z-index: 100;
+    
+    /* CORREÇÃO DO CLIQUE AQUI: */
+    pointer-events: auto; /* ...mas o alvo captura! */
+    
+    animation: popInTarget 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.target:active { transform: translate(-50%, -50%) scale(0.9); }
+
+/* Design do Alvo (Anéis) */
+.target::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%; height: 60%;
+    background: white; border-radius: 50%;
+}
+.target::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); z-index: 2;
+    width: 30%; height: 30%;
+    background: #ef4444; border-radius: 50%;
+}
+
+/* Camada de Miss Click */
+#miss-click-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; 
+    pointer-events: auto; 
+    cursor: crosshair;
+}
+
+/* Flash de Erro */
+.penalty-flash {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 0, 0, 0.4); pointer-events: none; z-index: 500;
+    animation: flash 0.15s linear;
+}
+
+/* --- 7. ANIMAÇÕES --- */
+
+@keyframes breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes popInTarget { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
+@keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes splatEnter {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+}
+@keyframes rippleAnim {
+    0% { width: 0px; height: 0px; opacity: 1; border-width: 5px; }
+    100% { width: 100px; height: 100px; opacity: 0; border-width: 0px; }
+}
+
+/* Ajuste do container de Melhor Tempo no Menu */
+#daily-best-container {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05); /* Fundo sutil para destacar */
+}
+
+/* 4. FLASH VERDE (Perfect Shot) */
+.perfect-flash {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(132, 204, 22, 0.4); /* Verde limão suave */
+    pointer-events: none; z-index: 500;
+    animation: flash 0.2s linear;
+}
+
+/* RANKING STYLES */
+.ranking-content { min-height: 400px; }
+
+.ranking-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: monospace; font-size: 1.1rem;
+}
+.ranking-row:nth-child(1) { color: #facc15; font-weight: bold; font-size: 1.3rem; } /* 1º Lugar Ouro */
+.ranking-row:nth-child(2) { color: #c0c0c0; } /* Prata */
+.ranking-row:nth-child(3) { color: #cd7f32; } /* Bronze */
+
+.ranking-row.is-me {
+    background: rgba(0, 85, 255, 0.2);
+    border: 1px solid var(--orka-accent);
+    border-radius: 4px;
+}
+.rank-pos { width: 30px; font-weight: bold; }
+.rank-name { flex-grow: 1; text-align: left; padding-left: 10px; }
+.rank-score { font-weight: bold; }
