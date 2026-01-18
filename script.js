@@ -2,7 +2,7 @@ import { OrkaCloud } from './core/scripts/orka-cloud.js';
 import { OrkaFX } from './core/scripts/orka-lib.js'; // Importando FX para o Toast
 
 export const gamesList = [
-    { id: 'zoo', type: 'daily', title: 'ORKA ZOO', descKey: 'game_zoo_desc', icon: 'zoo-logo.png', print: 'print-zoo.png', url: 'games/orkazoo/', releaseDate: '2026-01-05', active: true }, // Exemplo: data passada
+    { id: 'zoo', type: 'daily', title: 'ORKA ZOO', descKey: 'game_zoo_desc', icon: 'zoo-logo.png', print: 'print-zoo.png', url: 'games/orkazoo/', releaseDate: '2026-01-05', active: true },
     { id: 'jinx', type: 'web', title: 'ORKA JINX', descKey: 'game_jinx_desc', icon: 'jinx-logo.png', print: 'print-jinx.png', url: 'games/orkajinx/', releaseDate: '2026-01-13', active: true },
     { id: 'eagle', type: 'web', title: 'EAGLE AIM', descKey: 'game_eagle_desc', icon: 'eagle-logo.png', print: 'print-eagle.png', url: 'games/eagleaim/', releaseDate: '2026-01-17', active: true },
     // Jogos em breve (active: false)
@@ -22,6 +22,12 @@ export const translations = {
         nickLabel: "Seu Apelido",
         langLabel: "Idioma / Language",
         langDesc: "Jogos usarão esta preferência automaticamente.",
+
+        syncLabel: "Sincronizar / Login",
+        syncDesc: "Receba um código por e-mail para salvar seu progresso.",
+        authSent: "Código enviado! Cheque seu e-mail.",
+        authSuccess: "Login realizado com sucesso!",
+        authError: "Erro. Tente novamente.",
         
         game_zoo_desc: "Descubra o animal do dia.",
         game_jinx_desc: "Leia a mente alheia.",
@@ -39,6 +45,13 @@ export const translations = {
         nickLabel: "Nickname",
         langLabel: "Language",
         langDesc: "Games will use this preference automatically.",
+
+        
+        syncLabel: "Sync / Login",
+        syncDesc: "Get a code via email to save your progress.",
+        authSent: "Code sent! Check your email.",
+        authSuccess: "Logged in successfully!",
+        authError: "Error. Try again.",
 
         game_zoo_desc: "Discover the daily animal.",
         game_jinx_desc: "Read other minds.",
@@ -119,6 +132,26 @@ async function loadProfileData() {
         document.getElementById('default-avatar-icon').style.display = 'block';
     }
 
+    // --- LÓGICA DE UI DE LOGIN ---
+    const currentEmail = OrkaCloud.getEmail();
+    const loginContainer = document.getElementById('auth-logged-in');
+    const emailInputContainer = document.getElementById('auth-step-email');
+    const otpContainer = document.getElementById('auth-step-otp');
+    const emailDisplay = document.getElementById('display-email-auth');
+
+    if (currentEmail) {
+        // MODO LOGADO
+        if(loginContainer) loginContainer.style.display = 'flex';
+        if(emailInputContainer) emailInputContainer.style.display = 'none';
+        if(otpContainer) otpContainer.style.display = 'none'; // Garante que fecha o OTP
+        if(emailDisplay) emailDisplay.textContent = currentEmail;
+    } else {
+        // MODO ANÔNIMO
+        if(loginContainer) loginContainer.style.display = 'none';
+        if(emailInputContainer) emailInputContainer.style.display = 'flex';
+        // otpContainer mantém o estado que estava ou none
+    }
+
     // 3. Nickname & Lógica de Abertura Automática
     if (currentNick) {
         // Tem nick: Mostra normal
@@ -154,6 +187,15 @@ async function loadProfileData() {
         if (btn.dataset.lang === currentLang) btn.classList.add('selected');
         else btn.classList.remove('selected');
     });
+
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', async () => {
+            if(confirm("Deseja desconectar? Seus dados locais serão resetados.")) {
+                await OrkaCloud.logout();
+            }
+        });
+    }
 }
 
 function openModal(forceStay = false) {
@@ -392,3 +434,106 @@ window.addEventListener('beforeunload', () => {
 
 // Inicialização
 window.addEventListener('load', loadProfileData);
+
+// --- LÓGICA DE LOGIN (OTP) ---
+const stepEmail = document.getElementById('auth-step-email');
+const stepOtp = document.getElementById('auth-step-otp');
+const inputEmail = document.getElementById('input-email');
+const inputOtp = document.getElementById('input-otp');
+const authMsg = document.getElementById('auth-msg');
+
+// 1. Enviar Código
+// script.js
+
+document.getElementById('btn-send-code').addEventListener('click', async () => {
+    const email = inputEmail.value.trim();
+    if (!email.includes('@')) {
+        authMsg.textContent = "Email inválido.";
+        authMsg.style.color = "var(--status-wrong)";
+        return;
+    }
+
+    // Feedback visual
+    const btn = document.getElementById('btn-send-code');
+    const originalIcon = btn.innerHTML;
+    btn.innerHTML = '<span class="material-icons orka-spin">refresh</span>'; // Ícone de loading
+    btn.disabled = true;
+    
+    authMsg.textContent = "Conectando ao servidor...";
+    authMsg.style.color = "#888";
+
+    try {
+        const res = await OrkaCloud.requestEmailLogin(email);
+
+        if (res.success) {
+            stepEmail.style.display = 'none';
+            stepOtp.style.display = 'flex';
+            
+            const lang = OrkaCloud.getLanguage().startsWith('en') ? 'en' : 'pt';
+            authMsg.textContent = translations[lang].authSent;
+            authMsg.style.color = "var(--status-correct)";
+            inputOtp.focus();
+        } else {
+            // Trata erros (inclusive o 503 se acontecer de novo)
+            console.warn("Erro Login:", res.error);
+            authMsg.textContent = "Erro no servidor. Tente novamente em 1 min.";
+            authMsg.style.color = "var(--status-wrong)";
+        }
+    } catch (e) {
+        authMsg.textContent = "Erro de conexão.";
+        authMsg.style.color = "var(--status-wrong)";
+    } finally {
+        // Restaura o botão
+        btn.innerHTML = originalIcon;
+        btn.disabled = false;
+    }
+});
+
+// 2. Verificar Código
+document.getElementById('btn-verify-code').addEventListener('click', async () => {
+    const email = inputEmail.value.trim();
+    const token = inputOtp.value.trim();
+
+    authMsg.textContent = "Verificando...";
+
+    const res = await OrkaCloud.verifyEmailLogin(email, token);
+
+    if (res.success) {
+        const lang = OrkaCloud.getLanguage().startsWith('en') ? 'en' : 'pt';
+        authMsg.textContent = translations[lang].authSuccess;
+        authMsg.style.color = "var(--status-correct)";
+
+        if (res.isNewUser) {
+            // Se for novo, festa completa
+            OrkaFX.toast("Conta Sincronizada! +5 Bolos 🎂", "success");
+            OrkaFX.confetti(); 
+        } else {
+            // Se já existia, só aviso discreto
+            OrkaFX.toast(translations[lang].authSuccess, "success");
+        }
+
+        // Recarrega perfil visualmente
+        await loadProfileData();
+
+        // Fecha modal após 1.5s
+        setTimeout(() => {
+            document.getElementById('modal-profile').classList.remove('active');
+            // Reseta UI do Auth
+            stepEmail.style.display = 'flex';
+            stepOtp.style.display = 'none';
+            inputOtp.value = '';
+            authMsg.textContent = '';
+        }, 1500);
+
+    } else {
+        authMsg.textContent = "Código inválido ou expirado.";
+        authMsg.style.color = "var(--status-wrong)";
+    }
+});
+
+// 3. Cancelar / Voltar
+document.getElementById('btn-cancel-otp').addEventListener('click', () => {
+    stepEmail.style.display = 'flex';
+    stepOtp.style.display = 'none';
+    authMsg.textContent = "";
+});

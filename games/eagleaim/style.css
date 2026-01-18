@@ -330,20 +330,82 @@ header {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: rgba(255, 255, 255, 0.1); /* Vidro escuro */
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     border-radius: 50%;
     width: 45px; height: 45px;
-    display: flex; justify-content: center; align-items: center;
+    display: none; justify-content: center; align-items: center;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+    transition: transform 0.2s;
     z-index: 50; /* Acima de tudo no menu */
+    outline: none;
+    max-width: 50px;
+    max-height: 50px;
 }
 
 .float-home-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: transparent;
     transform: scale(1.1);
 }
 
+.float-home-btn img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
+    pointer-events: none; /* O clique vai no botão, não na imagem */
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.8));
+}
+
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    /* 1. Esconde o Header padrão */
+    header { display: none !important; }
+    
+    /* 2. Ajusta altura do jogo */
+    #game-wrapper { height: 100vh; }
+    
+    /* 3. AQUI ESTÁ O TRUQUE: Mostra o botão flutuante SÓ AGORA */
+    .float-home-btn { display: flex; }
+}
+
 .float-home-btn .material-icons { font-size: 24px; }
+
+/* Atualização do CSS do Ranking */
+
+.ranking-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 10px; /* Um pouco mais alto para caber a foto */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: monospace; font-size: 1.1rem;
+}
+
+/* Grupo da Esquerda (Posição + Foto + Nome) */
+.rank-left {
+    display: flex; align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+    overflow: hidden; /* Para nomes longos não quebrarem */
+}
+
+.rank-pos { 
+    width: 30px; font-weight: bold; flex-shrink: 0;
+}
+
+/* A FOTO DE PERFIL */
+.rank-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%; /* Redondo */
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: #000;
+}
+
+/* Destaque para o avatar do próprio jogador */
+.is-me .rank-avatar {
+    border-color: var(--orka-accent);
+}
+
+.rank-name { 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}

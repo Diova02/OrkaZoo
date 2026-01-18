@@ -16,6 +16,7 @@ let state = {
     startTime: null,
     isActive: false,
     sessionSaved: false,
+    email: null,
     profile: {
         nickname: null,
         bolo: 0,
@@ -44,31 +45,20 @@ supabase.auth.onAuthStateChange((event, session) => {
         window.location.reload();
     }
 });
-
 async function initAuth() {
-    if (authPromise) return authPromise;
-
-    authPromise = (async () => {
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session) {
-                state.userId = session.user.id;
-            } else {
-                console.log("👤 Criando anônimo...");
-                const { data, error } = await supabase.auth.signInAnonymously();
-                if (error) { console.error("🚨 Auth Error:", error.message); return null; }
-                state.userId = data.user.id;
-            }
-            
-            if (state.userId) await ensureProfile(state.userId);
-            return state.userId;
-        } catch (err) {
-            console.error("🚨 Auth Fatal:", err);
-            return null;
-        }
-    })();
-    return authPromise;
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+        state.userId = session.user.id;
+        state.email = session.user.email; // <--- CAPTURA O EMAIL
+    } else {
+        const { data } = await supabase.auth.signInAnonymously();
+        state.userId = data.user.id;
+        state.email = null;
+    }
+    
+    await ensureProfile(state.userId);
+    return state.userId;
 }
 
 async function init() {
@@ -245,13 +235,13 @@ async function track(eventName, type = 'interaction', data = {}) {
 async function getLeaderboard(gameId, dateObj = new Date()) {
     const dateStr = dateObj.toISOString().split('T')[0];
     
-    // Faz join com a tabela 'players' para pegar o nickname
+    // Agora buscamos 'profile_image' em vez de 'avatar_url'
     const { data, error } = await supabase
         .from('leaderboards')
-        .select(`score, player_id, players(nickname)`) 
+        .select(`score, player_id, players(nickname, profile_image)`) 
         .eq('game_id', gameId)
         .eq('played_at', dateStr)
-        .order('score', { ascending: true }) // Ascendente: Menor tempo vence
+        .order('score', { ascending: true }) 
         .limit(10);
 
     if (error) {
@@ -259,12 +249,19 @@ async function getLeaderboard(gameId, dateObj = new Date()) {
         return [];
     }
     
-    // Formata o retorno
-    return data.map(entry => ({
-        nickname: entry.players?.nickname || 'Anônimo',
-        score: entry.score,
-        isMe: entry.player_id === state.userId
-    }));
+    return data.map(entry => {
+        // TRATAMENTO DO AVATAR
+        // Se vier null ou vazio, usa 'default'. Se vier 'fox', usa 'fox'.
+        const imageSlug = entry.players?.profile_image || 'default';
+        const avatarPath = `../../assets/avatars/${imageSlug}.png`;
+
+        return {
+            nickname: entry.players?.nickname || 'Anônimo',
+            avatar: avatarPath, 
+            score: entry.score,
+            isMe: entry.player_id === state.userId
+        };
+    });
 }
 
 // Envia o score (O banco já trata o "Upsert" graças à constraint unique)
@@ -328,5 +325,143 @@ export const OrkaCloud = {
     registerAccount, loginAccount, logout,
     isRegistered: () => state.profile.is_registered,
     getLeaderboard,
-    submitScore
+    submitScore,
+
+    // --- AUTENTICAÇÃO / SYNC ---
+    async requestEmailLogin(email) {
+        // Removemos o 'shouldCreateUser' explícito para evitar conflitos, 
+        // o padrão do Supabase já é criar se não existir (se habilitado no painel).
+        const { data, error } = await supabase.auth.signInWithOtp({
+            email: email
+            // Não passamos options extras para usar o padrão "Magic Link" 
+            // que contém o token no corpo do email
+        });
+        return { success: !error, error };
+    },
+
+    async verifyEmailLogin(email, token) {
+        // Garante que não tem espaços extras que causam erro 403
+        const cleanEmail = email.trim();
+        const cleanToken = token.trim();
+
+        const { data, error } = await supabase.auth.verifyOtp({
+            email: cleanEmail,
+            token: cleanToken,
+            type: 'email'
+        });
+        
+        if (!error && data.session) {
+            state.userId = data.session.user.id;
+            
+            // Puxa o perfil para checar se é novo
+            const { data: profile } = await supabase.from('players')
+                .select('*')
+                .eq('id', state.userId)
+                .maybeSingle();
+                
+            let isFirstTime = false;
+
+            if (profile) {
+                // Atualiza estado local
+                state.profile = {
+                    ...state.profile,
+                    bolo: profile.bolo,
+                    inventory: profile.inventory || { avatars: ['default'] },
+                    nickname: profile.nickname,
+                    image: profile.profile_image
+                };
+
+                // Lógica do Bônus: Apenas avisa que foi a primeira vez, não faz UI aqui
+                if (!profile.is_registered) {
+                    await addBolo(5); // Função interna do cloud, essa funciona
+                    await supabase.from('players').update({ is_registered: true }).eq('id', state.userId);
+                    isFirstTime = true;
+                }
+            }
+
+            // Salva a sessão para persistir no reload
+            await supabase.auth.setSession(data.session);
+            
+            // Retorna sucesso e a flag se é novo usuário
+            return { success: true, isNewUser: isFirstTime };
+        }
+        
+        return { success: false, error };
+    },
+
+    // --- INVENTÁRIO & SHOP ---
+    
+    // Verifica se o usuário tem o item
+    hasItem: (itemId, type = 'avatars') => {
+        const inv = state.profile.inventory || { avatars: ['default'] };
+        const list = inv[type] || [];
+        return list.includes(itemId);
+    },
+
+    // Compra/Adiciona item e salva na nuvem
+    async unlockItem(itemId, type = 'avatars', cost = 0) {
+        if (!state.userId) return false;
+        
+        // 1. Verifica saldo
+        if (state.profile.bolo < cost) return false;
+
+        // 2. Atualiza Localmente
+        if (!state.profile.inventory) state.profile.inventory = { avatars: ['default'] };
+        if (!state.profile.inventory[type]) state.profile.inventory[type] = [];
+        
+        if (state.profile.inventory[type].includes(itemId)) return true; // Já tem
+        
+        state.profile.inventory[type].push(itemId);
+        state.profile.bolo -= cost;
+
+        // 3. Persiste no Banco
+        const { error } = await supabase.from('players').update({
+            inventory: state.profile.inventory,
+            bolo: state.profile.bolo
+        }).eq('id', state.userId);
+
+        return !error;
+    },
+
+    // --- CLOUD SAVE (O Segredo da Sincronia) ---
+
+    // Chame isso ao abrir um jogo (ex: no init do OrkaZoo)
+    async loadGameSave(gameId) {
+        if (!state.userId) return null;
+
+        const { data } = await supabase.from('game_saves')
+            .select('save_data')
+            .eq('player_id', state.userId)
+            .eq('game_id', gameId)
+            .maybeSingle();
+
+        if (data) {
+            console.log(`☁️ Save do ${gameId} baixado!`);
+            // Retorna os dados para o jogo decidir como usar
+            return data.save_data; 
+        }
+        return null;
+    },
+
+    // Chame isso ao fazer progresso importante (ex: terminar partida)
+    async saveGameProgress(gameId, dataObject) {
+        if (!state.userId) return;
+
+        // "Upsert" = Atualiza se existe, Cria se não existe
+        await supabase.from('game_saves').upsert({
+            player_id: state.userId,
+            game_id: gameId,
+            save_data: dataObject,
+            updated_at: new Date()
+        });
+        console.log(`☁️ Progresso do ${gameId} salvo na nuvem.`);
+    },
+
+    getEmail: () => state.email, // <--- EXPORTA A FUNÇÃO
+    
+    // Função de Logout (Útil para testar)
+    logout: async () => {
+        await supabase.auth.signOut();
+        window.location.reload(); // Recarrega para gerar novo ID anônimo
+    }
 };

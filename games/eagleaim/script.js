@@ -55,6 +55,54 @@ const els = {
     saveNickBtn: document.getElementById('save-nick-btn')
 };
 
+const I18N = {
+    'pt-BR': {
+        play: 'JOGAR',
+        play_again: 'JOGAR NOVAMENTE',
+        ranking_btn: '🏆 RANKING',
+        loading: 'Carregando...',
+        wave: 'ONDA',
+        aim: 'AIM!',
+        ready_title: 'PRONTO?',
+        best_today: 'MELHOR TEMPO DE HOJE',
+        sending: '🚀 Enviando score...',
+        loading_rank: 'Carregando ranking...',
+        be_first: 'Seja o primeiro a pontuar hoje!',
+        modal_nick_title: 'COMO DEVEMOS TE CHAMAR?',
+        save_btn: 'SALVAR E ENTRAR',
+        back_home: 'Voltar ao Hub',
+        perfect: 'PERFECT!',
+        error: 'ERRO!',
+        penalty: 'PENALIDADE!',
+        rotate: 'POR FAVOR, VIRE SEU DISPOSITIVO',
+        rotate_sub: 'Este jogo requer a tela na horizontal'
+    },
+    'en-US': {
+        play: 'PLAY',
+        play_again: 'PLAY AGAIN',
+        ranking_btn: '🏆 LEADERBOARD',
+        loading: 'Loading...',
+        wave: 'WAVE',
+        aim: 'AIM!',
+        ready_title: 'READY?',
+        best_today: 'TODAY\'S BEST',
+        sending: '🚀 Submitting score...',
+        loading_rank: 'Loading leaderboard...',
+        be_first: 'Be the first to score today!',
+        modal_nick_title: 'WHAT SHOULD WE CALL YOU?',
+        save_btn: 'SAVE AND ENTER',
+        back_home: 'Back to Hub',
+        perfect: 'PERFECT!',
+        error: 'MISS!',
+        penalty: 'PENALTY!',
+        rotate: 'PLEASE ROTATE DEVICE',
+        rotate_sub: 'This game requires landscape mode'
+    }
+};
+
+let currentLang = 'pt-BR'; // Padrão
+let T = I18N['pt-BR']; // Atalho para os textos atuais
+
 // =========================
 // 1. INICIALIZAÇÃO
 // =========================
@@ -78,14 +126,18 @@ async function init() {
     });
 
     loadDailyRecord();
-    
-    // Listener ATUALIZADO
+
     els.btnPlay.addEventListener('click', () => {
-        requestFullScreen(); // 🚀 Tenta esconder a barra de endereço
+        // DETECÇÃO DE MOBILE (Simples e eficaz)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Só pede fullscreen se for celular
+        if (isMobile) {
+            requestFullScreen(); 
+        }
         startCountdown();
     });
-    
-    
+        
     // Miss Click (Fundo transparente)
     els.missLayer.addEventListener('mousedown', (e) => handleMissClick(e));
     els.missLayer.addEventListener('touchstart', (e) => { e.preventDefault(); handleMissClick(e.touches[0]); });
@@ -451,21 +503,33 @@ async function submitAndOpenRanking() {
 }
 
 async function loadLeaderboardUI() {
-    els.rankingDate.textContent = state.currentDate.toLocaleDateString('pt-BR');
-    els.rankingList.innerHTML = '<div style="padding:20px; text-align:center;">Carregando ranking...</div>';
+    // Formata data localmente dependendo da língua
+    const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+    els.rankingDate.textContent = state.currentDate.toLocaleDateString(currentLang, dateOptions);
+    
+    els.rankingList.innerHTML = `<div style="padding:20px; text-align:center;">${T.loading_rank}</div>`;
     
     const data = await OrkaCloud.getLeaderboard(GAME_ID, state.currentDate);
     
     els.rankingList.innerHTML = ''; 
     if (data.length === 0) {
-        els.rankingList.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">Seja o primeiro a pontuar hoje!</div>';
+        els.rankingList.innerHTML = `<div style="padding:20px; text-align:center; color:#666;">${T.be_first}</div>`;
         return;
     }
 
     data.forEach((entry, index) => {
         const div = document.createElement('div');
         div.className = `ranking-row ${entry.isMe ? 'is-me' : ''}`;
-        div.innerHTML = `<span class="rank-pos">#${index + 1}</span><span class="rank-name">${entry.nickname}</span><span class="rank-score">${entry.score.toFixed(3)}s</span>`;
+        
+        // Renderiza Avatar + Nome + Score
+        div.innerHTML = `
+            <div class="rank-left">
+                <span class="rank-pos">#${index + 1}</span>
+                <img src="${entry.avatar}" alt="Avatar" class="rank-avatar" onerror="this.src='../../assets/icons/orka-logo.png'">
+                <span class="rank-name">${entry.nickname}</span>
+            </div>
+            <span class="rank-score">${entry.score.toFixed(3)}s</span>
+        `;
         els.rankingList.appendChild(div);
     });
 }

@@ -371,3 +371,42 @@ main{
     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     z-index: 10;
 }
+
+/* --- Área de Login/Sync --- */
+.auth-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.orka-input-box {
+    flex: 1;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 6px;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    transition: 0.2s;
+}
+.orka-input-box:focus {
+    border-color: var(--orka-accent);
+}
+
+.orka-btn-small {
+    background: var(--orka-accent);
+    border: none;
+    color: white;
+    padding: 0 15px;
+    height: 38px; /* Mesma altura do input visualmente */
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+}
+.orka-btn-small:hover { filter: brightness(1.2); }
+.orka-btn-small.success { background: var(--status-correct); }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.orka-spin { animation: spin 1s linear infinite; }

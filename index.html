@@ -115,6 +115,47 @@
                 Jogos usarão esta preferência automaticamente.
             </p>
         </div>
+
+        <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
+
+        <div class="profile-section">
+            <label data-t="syncLabel">Sincronizar Dados (Cloud Save)</label>
+            <p style="font-size:0.75rem; color:#888; margin-bottom:10px;" data-t="syncDesc">
+                Registre-se para não perder seu progresso!
+            </p>
+
+            <div id="auth-logged-in" class="auth-container" style="display:none; background:#1a2e1a; border:1px solid #2e5c2e; padding:10px; border-radius:8px; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="material-icons" style="color:var(--status-correct);">cloud_done</span>
+                    <div>
+                        <p style="margin:0; font-size:0.85rem; color:#fff; font-weight:bold;">Sincronizado</p>
+                        <p id="display-email-auth" style="margin:0; font-size:0.7rem; color:#ccc;">...</p>
+                    </div>
+                </div>
+                <button id="btn-logout" class="icon-btn-small danger" title="Desconectar">
+                    <span class="material-icons">logout</span>
+                </button>
+            </div>
+
+            <div id="auth-step-email" class="auth-container">
+                <input type="email" id="input-email" placeholder="seu@email.com" class="orka-input-box">
+                <button id="btn-send-code" class="orka-btn-small">
+                    <span class="material-icons">send</span>
+                </button>
+            </div>
+
+            <div id="auth-step-otp" class="auth-container" style="display:none;">
+                <input type="text" id="input-otp" placeholder="Código (ex: 123456)" class="orka-input-box" maxlength="6">
+                <button id="btn-verify-code" class="orka-btn-small success">
+                    <span class="material-icons">check</span>
+                </button>
+                <button id="btn-cancel-otp" class="icon-btn-small danger" style="margin-left:5px;">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            
+            <p id="auth-msg" style="font-size:0.75rem; margin-top:5px; height:15px;"></p>
+        </div>
     </div>
 
     <div id="modal-account" class="modal-overlay">
