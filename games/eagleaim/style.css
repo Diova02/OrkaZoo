@@ -502,3 +502,21 @@ header {
 .icon-only .material-icons {
     font-size: 20px; /* Tamanho controlado do ícone */
 }
+
+/* --- TOASTS FANTASMAS --- */
+
+/* O container já deve ignorar cliques */
+#toast-container {
+    pointer-events: none !important;
+}
+
+/* Os toasts individuais também ignoram cliques */
+.orka-toast {
+    pointer-events: none !important;
+    
+    /* Opcional: Se você quiser que o texto seja selecionável, 
+       mas o clique atravesse, use 'pointer-events: none' mesmo.
+       Se quiser que o botão de "fechar" (se houver) funcione,
+       aí precisaria de 'pointer-events: auto' aqui.
+       Como seus toasts são só avisos rápidos, 'none' é o ideal. */
+}
