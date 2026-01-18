@@ -156,7 +156,7 @@ async function setProfileImage(imgName) {
 }
 function getAvatarUrl() {
     if (!state.profile.image || state.profile.image === 'default') return null;
-    return `../../assets/pictures/${state.profile.image}`;
+    return `../../assets/avatars/${state.profile.image}.png`;
 }
 
 // SESSÃO

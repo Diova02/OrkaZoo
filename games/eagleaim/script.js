@@ -122,7 +122,8 @@ async function init() {
         'endgame': '../../assets/sounds/last-impact.mp3', // Fim das ondas
         'record': '../../assets/sounds/crowd-applause.mp3', // Pequena vinheta de vitória
         'precise': '../../assets/sounds/shine.mp3', //Perfect hit
-        'tick': '../../assets/sounds/beep.mp3'
+        'tick': '../../assets/sounds/beep.mp3',
+        'hit_armor': '../../assets/sounds/hit-armor.mp3'
     });
 
     loadDailyRecord();
@@ -141,6 +142,9 @@ async function init() {
     // Miss Click (Fundo transparente)
     els.missLayer.addEventListener('mousedown', (e) => handleMissClick(e));
     els.missLayer.addEventListener('touchstart', (e) => { e.preventDefault(); handleMissClick(e.touches[0]); });
+    //Compartilhar resultado
+    els.btnShare = document.getElementById('btn-share');
+    els.btnShare.addEventListener('click', shareResult);
     
     // 🔊 SOM DE TIRO GENÉRICO (Ao clicar em qualquer lugar do stage)
     document.getElementById('game-stage').addEventListener('mousedown', () => {
@@ -203,11 +207,37 @@ function generateDailyLevel(dateInput) {
 
     for (let w = 0; w < TOTAL_WAVES; w++) {
         const wave = { targets: [] };
-        const count = 3 + w + Math.floor(rng() * 1.5); 
+        const count = 3 + (2 * w) + Math.floor(rng() * 1.5); 
+
         for (let i = 0; i < count; i++) {
-            const x = 12 + (rng() * 76);
-            const y = 15 + (rng() * 70);
-            wave.targets.push({ id: `w${w}-t${i}`, x: x, y: y, scale: 0.9 + (rng() * 0.3) });
+            // Definição do Tipo (Baseado na dificuldade/onda)
+            // Onda 0: 100% normal
+            // Onda 1: 20% movel
+            // Onda 2: 30% movel, 10% blindado
+            let type = 'normal';
+            const roll = rng();
+            
+            if (w > 0 && roll > 0.7) type = 'moving';
+            if (w > 1 && roll > 0.7) type = 'armored';
+
+            // Configuração de Movimento (se for móvel)
+            let moveConfig = null;
+            if (type === 'moving') {
+                moveConfig = {
+                    axis: rng() > 0.5 ? 'X' : 'Y', // Horizontal ou Vertical
+                    speed: 2 + (rng() * 2) + 's', // 2s a 4s
+                    range: 20 + (rng() * 30) // Amplitude do movimento em %
+                };
+            }
+
+            wave.targets.push({
+                id: `w${w}-t${i}`,
+                x: 15 + (rng() * 70), // Margem segura
+                y: 15 + (rng() * 70),
+                scale: 0.9 + (rng() * 0.3),
+                type: type,      // 'normal', 'moving', 'armored'
+                move: moveConfig // null ou objeto
+            });
         }
         level.waves.push(wave);
     }
@@ -275,7 +305,7 @@ function spawnWave(index) {
     els.wave.textContent = `ONDA ${index + 1}/${TOTAL_WAVES}`;
     els.targets.innerHTML = ''; 
     
-    OrkaAudio.play('wave'); // 🔊 SOM DE ONDA
+    OrkaAudio.play('wave'); // 🔊 SOM DE GATILHO
     
     const waveData = state.levelData.waves[index];
     state.targetsLeft = waveData.targets.length;
@@ -283,9 +313,27 @@ function spawnWave(index) {
     waveData.targets.forEach((t, i) => {
         const el = document.createElement('div');
         el.className = 'target';
+        
+        // Aplica Classes Especiais
+        if (t.type === 'armored') {
+            el.classList.add('armored');
+            el.dataset.hp = 2; // Vida extra
+        }
+        
+        if (t.type === 'moving') {
+            el.classList.add('moving');
+            // Lógica Determinística de Movimento via CSS Var
+            // Precisamos ajustar o keyframe dinamicamente ou usar valores fixos
+            // Simplificação: Vamos usar style inline para animar
+            const animName = t.move.axis === 'X' ? 'moveHorizontal' : 'moveVertical';
+            el.style.animationName = animName;
+            el.style.animationDuration = t.move.speed;
+        }
+
+        // Posicionamento
         el.style.left = t.x + '%';
         el.style.top = t.y + '%';
-        el.style.transform = `translate(-50%, -50%) scale(0)`;
+        el.style.transform = `translate(-50%, -50%) scale(0)`; // Estado inicial
         
         // Efeito de entrada escalonado
         setTimeout(() => {
@@ -303,11 +351,12 @@ function spawnWave(index) {
             OrkaAudio.play('shoot'); // 🔊 SOM DE TIRO
             createVisualFX(clientX, clientY, true);
 
-            // Cálculo Perfect Shot
+            // Lógica Perfect Shot
             const rect = el.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             const dist = Math.hypot(clientX - centerX, clientY - centerY);
+            const isPerfect = dist < (rect.width / 2) * 0.25;
             
             if (dist < (rect.width / 2) * 0.25) { 
                 state.bonusTime += PERFECT_BONUS_MS;
@@ -321,6 +370,21 @@ function spawnWave(index) {
                 setTimeout(() => flash.remove(), 200);
             }
 
+            // LÓGICA DE VIDA (BLINDADO)
+            // Se for blindado, tem HP > 1 E NÃO foi perfect shot
+            if (t.type === 'armored' && parseInt(el.dataset.hp) > 1 && !isPerfect) {
+                // Apenas danifica
+                el.dataset.hp = 1;
+                el.classList.remove('armored'); // Vira vermelho (normal)
+                el.style.transform = `translate(-50%, -50%) scale(${t.scale * 0.8})`; // Encolhe um pouco com impacto
+                
+                OrkaAudio.play('hit_armor'); // (Sugestão: som metálico)
+                createVisualFX(clientX, clientY, false); // Splat azul/diferente?
+                return; // NÃO DESTRÓI AINDA!
+            }
+
+            // Se chegou aqui: Destrói
+            createVisualFX(clientX, clientY, true);
             el.remove();
             
             state.targetsLeft--;
@@ -365,7 +429,8 @@ function handleMissClick(e) {
 function createVisualFX(x, y, isHit) {
     // 1. Mancha
     const splat = document.createElement('div');
-    splat.className = 'splat';
+    const type = 1 + Math.floor(Math.random() * 3);
+    splat.className = `splat splat-type-${type}`;
     splat.style.left = x + 'px'; splat.style.top = y + 'px';
     splat.style.transform = `translate(-50%, -50%) rotate(${Math.random()*360}deg)`;
     els.splatLayer.appendChild(splat);
@@ -543,6 +608,18 @@ function requestFullScreen() {
     if (request && !doc.fullscreenElement) {
         // Tenta entrar em fullscreen (pode falhar se o usuário negar, mas tentamos)
         request.call(docEl).catch(err => console.log("Fullscreen bloqueado ou cancelado"));
+    }
+}
+
+async function shareResult() {
+    const dateStr = state.currentDate.toLocaleDateString('pt-BR');
+    const text = `🦅 EAGLE AIM | ${dateStr}\n⏱️ Tempo: ${state.finalTime}s\n\nConsegue me superar?\nJogue em: orka-hub.vercel.app/games/eagleaim/`;
+    
+    try {
+        await navigator.clipboard.writeText(text);
+        OrkaFX.toast('Copiado para área de transferência!', 'success');
+    } catch (err) {
+        OrkaFX.toast('Erro ao copiar', 'error');
     }
 }
 

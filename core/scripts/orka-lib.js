@@ -140,27 +140,62 @@ export const OrkaMath = {
 };
 
 // --- 6. MÓDULO DE ÁUDIO (NOVO) ---
+// --- 6. MÓDULO DE ÁUDIO (ATUALIZADO - WEB AUDIO API) ---
 export const OrkaAudio = {
-    sounds: {},
-    
-    // Carrega os sons para memória
-    load: (soundMap) => {
-        for (const [key, path] of Object.entries(soundMap)) {
-            const audio = new Audio(path);
-            audio.preload = 'auto'; // Tenta carregar imediatamente
-            OrkaAudio.sounds[key] = audio;
+    context: null,
+    buffers: {},
+
+    // Inicializa o contexto (deve ser chamado após interação do usuário)
+    init: () => {
+        if (!OrkaAudio.context) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            OrkaAudio.context = new AudioContext();
         }
     },
 
-    // Toca o som (com suporte a rapid-fire)
-    play: (key, volume = 1.0) => {
-        const original = OrkaAudio.sounds[key];
-        if (!original) return;
+    // Carrega sons (Agora suporta Async para performance)
+    load: (soundMap) => {
+        OrkaAudio.init();
+        
+        Object.entries(soundMap).forEach(async ([key, path]) => {
+            try {
+                const response = await fetch(path);
+                const arrayBuffer = await response.arrayBuffer();
+                // Decodifica o áudio para memória bruta (Zero Latência)
+                const audioBuffer = await OrkaAudio.context.decodeAudioData(arrayBuffer);
+                OrkaAudio.buffers[key] = audioBuffer;
+            } catch (e) {
+                console.warn(`Erro ao carregar som: ${key}`, e);
+            }
+        });
+    },
 
-        // Clona o nó de áudio para permitir sons simultâneos (ex: 3 tiros rápidos)
-        const clone = original.cloneNode();
-        clone.volume = volume;
-        clone.play().catch(e => console.warn("Audio bloqueado pelo navegador (interaja primeiro)"));
+    // Toca o som usando BufferSource (Super rápido)
+    play: (key, volume = 1.0) => {
+        if (!OrkaAudio.context) OrkaAudio.init();
+
+        // Navegadores bloqueiam áudio até o primeiro clique. Isso desbloqueia:
+        if (OrkaAudio.context.state === 'suspended') {
+            OrkaAudio.context.resume();
+        }
+
+        const buffer = OrkaAudio.buffers[key];
+        if (!buffer) return;
+
+        // Cria uma "fonte" descartável para esse som específico
+        const source = OrkaAudio.context.createBufferSource();
+        source.buffer = buffer;
+
+        // Controle de Volume
+        const gainNode = OrkaAudio.context.createGain();
+        gainNode.gain.value = volume;
+
+        // Conecta: Fonte -> Volume -> Alto-falante
+        source.connect(gainNode);
+        gainNode.connect(OrkaAudio.context.destination);
+
+        // Toca imediatamente
+        source.start(0);
     }
 };
 

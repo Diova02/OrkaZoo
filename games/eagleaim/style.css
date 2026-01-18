@@ -29,22 +29,40 @@ body.game-mode #global-bg {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
 }
-/* 2. NOVAS MANCHAS (Splats + Respingos) */
-/* A mancha principal fica mais escura/irregular */
+
+/* --- VESTÍGIOS ORGÂNICOS (BLOBS) --- */
+
 .splat {
     position: absolute;
     width: 50px; height: 50px;
-    background: rgba(0,0,0,0.5); /* Mais escuro */
-    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; /* Formato orgânico */
+    background: rgba(0,0,0,0.5); /* Cor base */
     transform: translate(-50%, -50%) scale(0);
     animation: splatEnter 0.15s forwards;
+    
+    /* O SEGREDO: Border-radius complexo cria formas líquidas, não pontudas */
+    border-radius: 50%; 
 }
 
-/* Os respingos ao redor */
+/* Variação 1: Meio achatada */
+.splat-type-1 {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+}
+
+/* Variação 2: Gota deformada */
+.splat-type-2 {
+    border-radius: 64% 36% 27% 73% / 71% 42% 58% 29%;
+}
+
+/* Variação 3: Oval torta */
+.splat-type-3 {
+    border-radius: 43% 57% 62% 38% / 36% 59% 41% 64%;
+}
+
+/* Mantenha os respingos (droplets) redondos */
 .splat-droplet {
     position: absolute;
     background: rgba(0,0,0,0.4);
-    border-radius: 50%;
+    border-radius: 50%; /* Respingos são redondinhos mesmo */
     transform: translate(-50%, -50%) scale(0);
     animation: splatEnter 0.2s forwards;
 }
@@ -408,4 +426,79 @@ header {
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis;
+}
+
+/* Sobrescrevendo estilo base APENAS para o Eagle Aim */
+#toast-container {
+    top: auto !important;
+    bottom: 20px !important; /* Fixado em baixo */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    
+    flex-direction: column-reverse; /* Novos aparecem embaixo e empurram */
+    justify-content: flex-end;
+}
+
+.orka-toast {
+    padding: 8px 15px; /* Menor */
+    font-size: 0.9rem;
+    animation-duration: 0.2s; /* Entrada rápida */
+    opacity: 0.9;
+}
+
+/* --- NOVOS TIPOS DE ALVO --- */
+
+/* 1. BLINDADO (Azul) */
+.target.armored {
+    background: #3b82f6; /* Azul */
+    border-color: #93c5fd;
+}
+.target.armored::before { background: #3b82f6; }
+
+/* 2. MÓVEL */
+/* Definimos a animação, mas a duração/direção virá via JS inline */
+@keyframes moveHorizontal { 0% { transform: translate(-150%, -50%); } 100% { transform: translate(50%, -50%); } }
+@keyframes moveVertical { 0% { transform: translate(-50%, -150%); } 100% { transform: translate(-50%, 50%); } }
+
+.target.moving {
+    /* O JS vai injetar 'animation-name' e 'animation-duration' */
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+}
+
+/* --- UI DE FINAL DE JOGO --- */
+
+.score-actions {
+    display: flex; 
+    gap: 10px; 
+    justify-content: center; 
+    align-items: center;
+    margin-top: 15px;
+}
+
+.small-btn {
+    font-size: 1rem;
+    height: 42px; /* Altura fixa para alinhar texto e ícone */
+    padding: 0 20px; /* Padding apenas lateral */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 21px; /* Arredondado completo (metade da altura) */
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* O botão de compartilhar (Apenas Ícone) */
+.icon-only {
+    padding: 0;      /* Sem padding lateral */
+    width: 42px;     /* Largura igual à altura (Quadrado/Círculo) */
+    min-width: 42px; /* Garante que não esmague */
+    font-size: 1.2rem; /* Ícone um pouco maior */
+}
+
+.icon-only .material-icons {
+    font-size: 20px; /* Tamanho controlado do ícone */
 }
